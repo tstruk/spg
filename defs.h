@@ -1,7 +1,7 @@
 /*************************************************************************
  * Small Privacy Guard
  * Copyright (C) Tadeusz Struk 2009 <tstruk@gmail.com>
- * $Id: defs.h 272 2009-04-02 05:54:52Z tadeusz $
+ * $Id$
  *
  * This is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published

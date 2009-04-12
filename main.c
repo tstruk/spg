@@ -1,7 +1,7 @@
 /*************************************************************************
  * Small Privacy Guard
  * Copyright (C) Tadeusz Struk 2009 <tstruk@gmail.com>
- * $Id: main.c 274 2009-04-12 06:04:57Z tadeusz $
+ * $Id$
  *
  * This is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
