@@ -1,6 +1,6 @@
 #!/bin/csh
 
-set PROG = prog
+set PROG = spg
 set KEYS = "secp112r1 secp112r2 secp128r1 secp128r2 secp160r1 secp160r2 secp192r1 secp224r1 secp256r1 secp384r1 secp521r1"
 
 echo "RUNNING TESTS"
