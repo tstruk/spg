@@ -1,0 +1,4 @@
+Build instructions
+To build Small Privacy Guard simply type 'make'
+You have to have gcrypt and openSSL libraries installed in your system
+

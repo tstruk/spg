@@ -1,0 +1,11 @@
+--+------------------------------------+----------+
+# | Description                        | Priority |
+--+------------------------------------+----------+
+1. Implement OIDs for curves             High
+2. Implment key generation by lenth      High
+3. Split main.c into more files          Normal
+4. Choose name for the application       Normal
+5. Create scons biuld script             Low
+6. Add timing for ECC                    High
+8. Create nice output for -l             Normal
+
