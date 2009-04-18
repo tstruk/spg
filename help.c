@@ -119,14 +119,15 @@ void print_help ( void )
 	printf("\n SPG " VERSION_STRING "\n\n");
 	printf("Use: %s commands [options] [file ...]\n", program_name );
 	printf("Commands are: \n"
-		"   -g --gen_key         Generate private key\n"
-		"   -x --xport           eXport public key from private key\n"
-		"   -s --sign            Generate message signature\n"
-		"   -v --verify          Verify message signature\n"
-		"   -e --encrypt         Encrypt\n"
-		"   -d --decrypt         Decrypt\n"
-		"   -l --list_curves     List implemented curves\n"
-		"   -h --help            Print help and exit\n"
+		"   -g --gen_key          Generate private key\n"
+		"   -x --xport            eXport public key from private key\n"
+		"   -s --sign             Generate message signature\n"
+		"   -v --verify           Verify message signature\n"
+		"   -e --encrypt          Encrypt\n"
+		"   -d --decrypt          Decrypt\n"
+		"   -l --list_curves      List implemented curves\n"
+		"   -p --list_sym_ciphers List symmetric ciphers\n"
+		"   -h --help             Print help and exit\n"
 		);
 	printf("Options are: \n"
 		"   -c --curve           Use this curve\n"

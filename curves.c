@@ -38,8 +38,10 @@ static curve_t curves_tab[] = {
 	{
 		/* name */
 		"secp112r1",
+		/* security level */
+		key112,
 		/* oid */
-		{ 1, 3, 132, 0, 6},
+                "1.3.132.0.6",
 		/* curve params */
 		/* prime p */
 		"DB7C2ABF62E35E668076BEAD208B",
@@ -65,8 +67,10 @@ static curve_t curves_tab[] = {
 	{
 		/* name */
 		"secp112r2",
+		/* security level */
+		112,
 		/* oid */
-		{1, 3, 132, 0, 7},
+		"1.3.132.0.7",
 		/* curve params */
 		/* prime p */
 		"DB7C2ABF62E35E668076BEAD208B",
@@ -92,8 +96,10 @@ static curve_t curves_tab[] = {
 	{
 		/* name */
 		"secp128r1",
+		/* security level */
+		128,
 		/* oid */
-		{ 1, 3, 132, 0, 28},
+		"1.3.132.0.28",
 		/* curve params */
 		/* prime p */
 		"FFFFFFFDFFFFFFFFFFFFFFFFFFFFFFFF",
@@ -119,8 +125,10 @@ static curve_t curves_tab[] = {
 	{
 		/* name */
 		"secp128r2",
+		/* security level */
+		128,
 		/* oid */
-		{ 1, 3, 132, 0, 29},
+		"1.3.132.0.29",
 		/* curve params */
 		/* prime p */
 		"FFFFFFFDFFFFFFFFFFFFFFFFFFFFFFFF",
@@ -146,8 +154,10 @@ static curve_t curves_tab[] = {
 	{
 		/* name */
 		"secp160r1",
+		/* security level */
+		160,
 		/* oid */
-		{ 1, 3, 132, 0, 8},
+		"1.3.132.0.8",
 		/* curve params */
 		/* prime p */
 		"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFF",
@@ -173,8 +183,10 @@ static curve_t curves_tab[] = {
 	{
 		/* name */
 		"secp160r2",
+		/* security level */
+		160,
 		/* oid */
-		{ 1, 3, 132, 0, 30},
+		"1.3.132.0.30",
 		/* curve params */
 		/* prime p */
 		"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFAC73",
@@ -201,8 +213,10 @@ static curve_t curves_tab[] = {
 	{
 		/* name */
 		"secp192r1",
+		/* security level */
+		192,
 		/* oid */
-		{ 1, 3, 132, 0, 29},
+		"1.2.840.10045.3.1.1",
 		/* curve params */
 		/* prime p */
 		"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF",
@@ -228,8 +242,10 @@ static curve_t curves_tab[] = {
 	{
 		/* name */
 		"secp224r1",
+		/* security level */
+		224,
 		/* oid */
-		{ 1, 3, 132, 0, 33},
+		"1.3.132.0.33",
 		/* curve params */
 		/* prime p */
 		"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000001",
@@ -255,8 +271,10 @@ static curve_t curves_tab[] = {
 	{
 		/* name */
 		"secp256r1",
+		/* security level */
+		256,
 		/* oid */
-		{ 1, 3, 132, 0, 29},
+		"1.2.840.10045.3.1.7",
 		/* curve params */
 		/* prime p */
 		"FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF",
@@ -282,8 +300,10 @@ static curve_t curves_tab[] = {
 	{
 		/* name */
 		"secp384r1",
+		/* security level */
+		384,
 		/* oid */
-		{ 1, 3, 132, 0, 29},
+		"1.3.132.0.34", 
 		/* curve params */
 		/* prime p */
 		"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF",
@@ -309,8 +329,10 @@ static curve_t curves_tab[] = {
 	{
 		/* name */
 		"secp521r1",
+		/* security level */
+		521,
 		/* oid */
-		{ 1, 3, 132, 0, 29},
+		"1.3.132.0.35",
 		/* curve params */
 		/* prime p */
 		"01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
@@ -329,13 +351,27 @@ static curve_t curves_tab[] = {
 		"01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA51868783BF2F966B7FCC0148F709A5D03BB5C9B8899C47AEBB6FB71E91386409",
 		/* h */
 		1
+	},
+/*
+ * Null terminator
+ */ 
+	{
+		NULL,
+		9999,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		{NULL, NULL},
+		NULL,
+		0
 	}
 };
 
 
 static inline unsigned int curves_number( void )
 {
-	return (sizeof(curves_tab) / sizeof(curve_t));
+	return (sizeof(curves_tab) / sizeof(curve_t)) - 1;
 }
 
 status populate_curve( curve* c ,curve_t* c_tab)
@@ -344,6 +380,9 @@ status populate_curve( curve* c ,curve_t* c_tab)
 	c->name = malloc(strlen( c_tab->name ) + 1); 
 	memcpy ( c->name, c_tab->name, strlen( c_tab->name ) );
 	c->name[strlen( c_tab->name )] = '\0';
+	c->oid = malloc(strlen( c_tab->oid ) + 1); 
+	memcpy ( c->oid, c_tab->oid, strlen( c_tab->oid ) );
+	c->oid[strlen( c_tab->oid )] = '\0';
 	if( GPG_ERR_NO_ERROR != gcry_mpi_scan( &c->params.p , GCRYMPI_FMT_HEX, c_tab->p, 0, NULL) )
 	{
 		return FAIL;
@@ -374,11 +413,8 @@ status populate_curve( curve* c ,curve_t* c_tab)
 
 void free_curve(curve *c)
 {
-	if( NULL != c->name )
-	{
-		free(c->name);
-		c->name = NULL;
-	}
+	FREE(c->name);
+	FREE(c->oid);
 	gcry_mpi_release( c->params.p);
 	gcry_mpi_release( c->params.a );
 	gcry_mpi_release( c->params.b );
@@ -394,7 +430,7 @@ void init_curve( curve* c)
 	memset(c, '\0', sizeof(curve));
 }
 
-status get_curve( curve* c, const char* name )
+status get_curve_by_name( curve* c, const char* name )
 {
 	int i = 0;
 	status stat = FAIL;
@@ -418,13 +454,42 @@ status get_curve( curve* c, const char* name )
 	return stat;
 }
 
+status get_curve_by_len( curve* c, const int len )
+{
+	int i = 0;
+	status stat = FAIL;
+	curve_t* c_tab = curves_tab;
+
+	assert(c != NULL);
+	init_curve(c);
+	for(i = 0; i < curves_number(); i++ )
+	{
+		c_tab = &curves_tab[i];
+
+		if( len > c_tab->security &&  c_tab->security < (c_tab+1)->security )
+		{
+			if( (stat = populate_curve( c, c_tab) ) == FAIL )
+			{
+				free_curve(c);
+			}
+			break;
+		}
+	}
+	return stat;
+}
+
+
 void list_curves( void )
 {
 	int i = 0;
 	curve_t* c_tab = NULL;
+	printf("+--+-----------+---------+---------------------+\n");
+	printf("|Nr|   Name    | Key len | OID                 |\n");
+	printf("+--+-----------+---------+---------------------+\n");
 	for(i = 0; i < curves_number(); i++ )
 	{
 		c_tab = &curves_tab[i];
-		printf("%2d. %s \n", i+1, c_tab->name);
+		printf("|%2d| %s | %3d     | %-19s | \n", i+1, c_tab->name, c_tab->security, c_tab->oid );
 	}
+	printf("+--+-----------+---------+---------------------+\n");
 }

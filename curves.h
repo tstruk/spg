@@ -31,7 +31,8 @@ typedef struct point_str_s {
  */ 
 typedef struct curve_str_s {
 	char* name;
-	int oid[OID_NUMBERS];
+	security_level_t security;
+	char* oid;
 	char* p;
 	char* a;
 	char* b;
@@ -40,8 +41,30 @@ typedef struct curve_str_s {
 	int h;
 } curve_t ;
 
-status get_curve( curve* c, const char* name );
+/*
+ * Function: get_curve_by_name
+ * Returns curve structure that coresponds to the curve name
+ * To list all curves names use list_curves
+ */
+status get_curve_by_name( curve* c, const char* name );
+
+/*
+ * Function: get_curve_by_key_len
+ * Returns curve structure where the prime p is min len 
+ * bits long
+ */ 
+status get_curve_by_key_len( curve* c, const int len );
+
+/*
+ * Function: free_curve
+ * Free all memory fo the curve structure
+ */ 
 void free_curve(curve* c);
+
+/*
+ * Function: list_curves
+ * Lists all implemented curves
+ */ 
 void list_curves( void );
 
 #endif

@@ -39,10 +39,6 @@
 /*
  * Globals 
  */ 
-const char* program_name;
-int verbose = 0;
-int timing = 0;
-
 #define BUFFER_SIZE 512
 
 /*
@@ -252,7 +248,7 @@ static status read_private_key(EC_private_key_t* private_key, char* in_file)
 				buff_ptr += 1;
 				memcpy( curve_name, buff_ptr, (size_t) size );
 				curve_name[ (size_t)size ] = '\0';
-				stat = get_curve(&c, curve_name);
+				stat = get_curve_by_name(&c, curve_name);
 				if(SUCCESS == stat)
 				{
 					private_key->pub.c = c;
@@ -432,7 +428,7 @@ static status read_public_key ( EC_public_key_t* public_key, char* in_file )
 				buff_ptr += 1;
 				memcpy( curve_name, buff_ptr, (size_t) size );
 				curve_name[ (size_t)size ] = '\0';
-				stat = get_curve(&c, curve_name);
+				stat = get_curve_by_name(&c, curve_name);
 				if(SUCCESS == stat)
 				{
 					public_key->c = c;
@@ -470,7 +466,7 @@ status export_public_key (char* in_file, char* out_file )
 /*
  *
  */ 
-status write_signature( EC_signature_t* signature, char* output )
+static status write_signature( EC_signature_t* signature, char* output )
 {
 	status stat = SUCCESS;
 	unsigned char key_buff[BUFFER_SIZE];
@@ -530,7 +526,7 @@ status write_signature( EC_signature_t* signature, char* output )
 /*
  *
  */ 
-status read_signature( EC_signature_t *sign, char* sign_file )
+static status read_signature( EC_signature_t *sign, char* sign_file )
 {
 	status stat = SUCCESS;
         char *name = NULL, *header = NULL ;
@@ -1196,279 +1192,3 @@ status decrypt( char* key_file, char* file_to_decrypt, char* output )
 	return stat;
 }
 
-typedef enum {
-	op_noop = 0,
-	op_gen_key,
-	op_exp_pub_key,
-	op_gen_sign,
-	op_ver_sign,
-	op_encrypt,
-	op_decrypt, 
-	op_help
-
-} operation;
-
-int main(int argc, char** argv)
-{
-	status stat = SUCCESS;
-	int next_option = 0;
-	int option_numbers = 0;
-	const char* const default_curve = "secp160r2";
-
-	char* curve_name = NULL;
-	char* input = NULL;
-	char* key_file = NULL;
-	char* output = NULL;
-	operation opr = op_noop;
-
-	/*
-	 * Possible user params are
-	 */ 
-	const char* const short_options = "gxsvedlhc:i:k:o:Vt";
-	const struct option long_options [] = {
-		{ "gen_key", 0, NULL, 'g' },     /* Generate private key  */
-		{ "xport", 0, NULL, 'x' },       /* Export public key from private key */
-		{ "sign", 0, NULL, 's' },        /* Generate message signature */
-		{ "verify", 0, NULL, 'v' },      /* Verify message signature */
-		{ "encrypt", 0, NULL, 'e' },     /* Encrypt data */
-		{ "decrypt", 0, NULL, 'd' },     /* Decrypt data */
-		{ "list_curves", 0, NULL, 'l' }, /* Lits implemented curves */
-		{ "help", 0, NULL, 'h' },        /* Print help and exit */
-		{ "verbose", 0, NULL, 'V' },     /* Turn verbose on */
-		{ "curve", 1, NULL, 'c' },       /* Choose curve */
-		{ "input", 1, NULL, 'i' },       /* Input file */
-		{ "key", 1, NULL, 'k' },         /* Private/Public Key file */
-		{ "output", 1, NULL, 'o' },      /* Output file */
-		{ "timing", 0, NULL, 't' },      /* Print timing */
-		{ NULL, 0, NULL, 0 }             /* NULL terminator*/
-	};
-	
-	program_name = argv[0];
-	/*
-	 * Process user params
-	 */ 
-	do {
-		next_option = getopt_long(argc, argv, short_options, long_options, NULL );
-		switch(next_option)
-		{
-			case 'g':
-				opr = op_gen_key;
-				break;
-			case 'x':
-				opr = op_exp_pub_key;
-				break;
-			case 's':
-				opr = op_gen_sign;
-				break;
-			case 'v':
-				opr = op_ver_sign;
-				break;
-			case 'e':
-				opr = op_encrypt;
-				break;
-			case 'd':
-				opr = op_decrypt;
-				break;
-			case 'l':
-				list_curves();
-				exit(SUCCESS);
-			case 'h':
-				opr = op_help;
-				break;
-			case 'c':
-				curve_name = optarg;
-				break;
-			case 'i':
-				input = optarg;
-				break;
-			case 'k':
-				key_file = optarg;
-				break;
-			case 'o':
-				output = optarg;
-				break;
-			case 'V':
-				verbose = 1;
-				break;
-			case 't':
-				timing = 1;
-				break;
-			case -1:
-				break;
-			case '?':
-				print_help();
-			default:
-				exit(FAIL);
-		}
-		option_numbers++;
-	} while ( next_option != -1 );
-
-	if(!curve_name)
-		curve_name = (char*) default_curve;
-
-	switch ( opr )
-	{
-		case op_gen_key:
-			/*
-			 * Operation generate ECC keys
-			 */
-			if( curve_name && output )
-			{
-				stat = generate_keys( curve_name, output );
-				if(stat != SUCCESS)
-				{
-					INFO_LOG( "Generate keys operation failed\n");
-				}
-			}
-			else
-			{
-				INFO_LOG("Generate keys - invalid parameters. Try --help\n");
-			}
-		break;
-		case op_exp_pub_key:
-			/*
-			 * Operation export ECC public key
-			 */ 
-			if( key_file && output )
-			{
-				stat = export_public_key( key_file, output );
-				if(stat != SUCCESS)
-				{
-					INFO_LOG( "Export public key operation failed\n");
-				}	
-			}
-			else
-			{
-				INFO_LOG("eXport public key - invalid parameters. Try --help\n");
-			}
-		break;
-		case op_gen_sign:
-			/*
-			 * Operation generate message signature
-			 */ 
-			if( argc > option_numbers )
-			{
-				if( (key_file) && (output) )
-				{
-					stat = generate_signature( key_file, output, argv[ argc - 1 ] );
-					if(stat != SUCCESS)
-					{
-						INFO_LOG( "Generate message signature operation failed\n");
-					}
-					else
-					{
-						INFO_LOG("Signature generated successfuly\n");
-					}
-				}
-				else
-				{
-					INFO_LOG("Generate message signature - invalid parameters. Try --help\n");
-				}
-			}
-			else
-			{
-				INFO_LOG("No file to sign. Try --help\n");
-			}
-
-		break;
-		case op_ver_sign:
-			/*
-			 * Operation verify message signature
-			 */ 
-			if( argc > option_numbers )
-			{
-				if( key_file && input )
-				{
-
-					stat = verify_signature( key_file, input,  argv[ argc - 1 ]  );
-					if(stat == SUCCESS)
-					{
-						INFO_LOG("Signature is valid\n");
-					}
-					else if( stat == SIGNATURE_INVALID )
-					{
-						INFO_LOG("Signature is NOT valid\n");
-					}
-					else
-					{
-						ERROR_LOG("Signature verify failed\n");
-					}
-				
-				}
-				else 
-				{
-					INFO_LOG("Verify signature - invalid parameters. Try --help\n");
-				}
-			}
-			else
-			{
-				INFO_LOG("No file to verify. Try --help\n");
-			}
-
-		break;
-		case op_encrypt:
-			/*
-			 * Operation Encrypt
-			 */ 
-			if( argc > option_numbers && key_file )
-			{
-
-				stat = encrypt( key_file, argv[ argc - 1 ] );
-				if(stat != SUCCESS)
-				{
-					ERROR_LOG( "Encrypt operation failed\n");
-				}
-
-			}
-			else if(!(key_file))
-			{
-				INFO_LOG("Encrypt - invalid parameters. Try --help\n");
-			}
-			else
-			{
-				INFO_LOG("No file to encrypt. Try --help\n");
-			}
-		break;
-		case op_decrypt:
-			/*
-			 * Operation Decrypt
-			 */ 
-			if( argc > option_numbers && key_file )
-			{
-				stat = decrypt( key_file, argv[ argc - 1 ], output );
-				if(stat != SUCCESS)
-				{
-					ERROR_LOG( "Decrypt operation failed\n");
-				}	
-			}
-			else if(!(key_file))
-			{
-				INFO_LOG("Decrypt - invalid parameters. Try --help\n");
-			}			
-			else
-			{
-				INFO_LOG("No file to decrypt. Try --help\n");
-			}
-
-		break;
-		case op_help:
-			/*
-			 * Operation print help
-			 */ 
-			if( argc > option_numbers )
-			{
-				print_operation_help(argv[ argc - 1 ]);	
-			}
-			else
-			{
-				print_help( );
-			}
-		break;
-		default:
-			print_help();
-			stat = FAIL;
-		break;
-	}
-
-	return stat;
-}

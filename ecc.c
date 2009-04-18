@@ -44,7 +44,7 @@ status ec_generate_key(EC_private_key_t* priv_key, const char *curve_name)
 	status stat = SUCCESS;
 
 	assert(priv_key != NULL);
-	stat = get_curve(&c, curve_name);
+	stat = get_curve_by_name(&c, curve_name);
 
 	if( SUCCESS != stat )
 	{

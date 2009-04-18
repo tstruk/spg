@@ -19,14 +19,17 @@
 
 #ifndef SPG_SYM_CIPHER
 #define SPG_SYM_CIPHER
+
 /*
  * List of supported symmetric ciphers  
  */ 
 typedef enum {
 	
 	SYM_CIPHER_BLOWFISH = 0,
-	SYM_CIPHER_AES
+	SYM_CIPHER_AES,
+	SYM_CIPHER_TERM
 } sym_cipher;
+extern const char* cipher_names[];
 
 /*
  * Symmetric cipher context
@@ -64,6 +67,11 @@ inline status sym_cipher_decrypt( sym_cipher_hdl_t* cipher_hdl, void* in, void* 
  * Release symmetric cipher context
  */ 
 inline status sym_cipher_close( sym_cipher_hdl_t* cipher_hdl );
+
+/*
+ * Function: list_ciphers
+ */ 
+void sym_cipher_list(void);
 
 #endif /* SPG_SYM_CIPHER */
 

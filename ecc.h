@@ -17,8 +17,8 @@
  *
  *************************************************************************/
 
-#ifndef _SPG_H_
-#define _SPG_H_
+#ifndef _SPG_ECC_H_
+#define _SPG_ECC_H_
 
 typedef enum security_level_e {
 	key56 = 56,
@@ -27,8 +27,12 @@ typedef enum security_level_e {
 	key96 = 96,
 	key112 = 112,
 	key128 = 128,
+	key160 = 160,
 	key192 = 192,
-	key256 = 256
+	key224 = 224,
+	key256 = 256,
+	key384 = 384,
+	key521 = 521
 } security_level_t;
 
 /*
@@ -61,8 +65,6 @@ struct domain_GFp_params_s {
 	unsigned int h;
 };
 
-#define OID_NUMBERS 5
-
 typedef struct curve_over_GFp_s {
 	char* name;
 	/*
@@ -70,7 +72,7 @@ typedef struct curve_over_GFp_s {
 	 * For example see http://www.oid-info.com/get/1.3.132.0.6
 	 */  
 	char* oid;
-	security_level_t sec_level;
+	security_level_t security;
 	GFp_params_t params;
 } GFp_curve_t;
 

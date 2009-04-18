@@ -27,6 +27,15 @@
 
 
 /*
+ * Symmetric ciphers names
+ */ 
+const char* cipher_names[] = {
+	"Blowfish",
+	"AES",
+	NULL
+};
+
+/*
  * Private context structure for 
  * blowfish cipher
  */ 
@@ -137,7 +146,6 @@ inline status sym_cipher_encrypt( sym_cipher_hdl_t* cipher_hdl, void* in, void* 
 inline status sym_cipher_decrypt( sym_cipher_hdl_t* cipher_hdl, void* in, void* out, size_t len )
 {
 	return cipher_hdl->decrypt( cipher_hdl, in, out, len );
-
 }
 
 /*
@@ -149,4 +157,20 @@ inline status sym_cipher_close( sym_cipher_hdl_t* cipher_hdl )
 	FREE( cipher_hdl );
 	return stat;
 }
+/*
+ * Function: list_ciphers
+ */ 
+void sym_cipher_list(void)
+{
+        char** tab_ptr = (char**)cipher_names;
+	int i = 0;
+	while( NULL != *tab_ptr )
+	{
+		printf("%2d. %s\n", i, *tab_ptr++ );
+		i++;
+	}
+	return;
+}
+
+
 
