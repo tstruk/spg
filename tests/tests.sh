@@ -9,7 +9,7 @@ echo "RUNNING TESTS"
 ########################
 foreach KEY ( $KEYS )
 echo "######### ${KEY} #################"
-	./${PROG} -g -c ${KEY} -okeys/${KEY}.pem
+	./${PROG} -tV -g -c ${KEY} -okeys/${KEY}.pem
 #	ls -l keys/${KEY}.pem
 
 	if( $? == 0 ) then
@@ -30,7 +30,7 @@ echo "##################################"
 
 foreach KEY ( $KEYS )
 echo "######### ${KEY} #################"
-	./${PROG} -x -kkeys/${KEY}.pem -okeys/public_${KEY}.pem
+	./${PROG} -tV -x -kkeys/${KEY}.pem -okeys/public_${KEY}.pem
 	if( $? == 0 ) then
 		echo ${KEY} key exported ok
 	else
@@ -45,7 +45,7 @@ end
 ########################
 foreach KEY ( $KEYS )
 	echo "######### ${KEY} signing the message  #################"
-	./${PROG} -s -kkeys/${KEY}.pem -omessage.txt.sign message.txt
+	./${PROG} -tV -s -kkeys/${KEY}.pem -omessage.txt.sign message.txt
 	if( $? == 0 ) then
 		echo Message signed ok
 	else
@@ -55,7 +55,7 @@ foreach KEY ( $KEYS )
 	endif
 
 	echo "######### ${KEY} verifying the message  #################"
-	./${PROG} -v -kkeys/public_${KEY}.pem -imessage.txt.sign message.txt
+	./${PROG} -tV -v -kkeys/public_${KEY}.pem -imessage.txt.sign message.txt
 	if( $? == 0 ) then
 		echo Message signed ok
 	else
@@ -65,7 +65,7 @@ foreach KEY ( $KEYS )
 	endif
 
 		echo "######### ${KEY} verifying the message_changed  #################"
-	./${PROG} -v -kkeys/public_${KEY}.pem -imessage.txt.sign message_changed.txt
+	./${PROG} -tV -v -kkeys/public_${KEY}.pem -imessage.txt.sign message_changed.txt
 	if( $? == 0 ) then
 		echo Message signature ok - test failed
 		echo "!!!!!!!!!!!!!! FAILED !!!!!!!!!!!!!!!"
@@ -75,10 +75,12 @@ foreach KEY ( $KEYS )
 	endif
 end
 
-
+########################
+# Test encrypt/decrypt
+########################
 foreach KEY ( $KEYS )
 	echo "######### ${KEY} encrypting data  #################"
-	./${PROG} -e -kkeys/public_${KEY}.pem message.txt
+	./${PROG} -tV -e -kkeys/public_${KEY}.pem message.txt
 	if( $? == 0 ) then
 		echo Message encrypted ok
 	else
@@ -88,7 +90,7 @@ foreach KEY ( $KEYS )
 	endif
 	
 	echo "######### ${KEY} decrypting data  #################"
-	./${PROG} -d -kkeys/${KEY}.pem message.txt.enc
+	./${PROG} -tV -d -kkeys/${KEY}.pem -o message.txt.dec message.txt.enc
 	if( $? == 0 ) then
 		echo Message decrypted ok
 	else
@@ -97,14 +99,14 @@ foreach KEY ( $KEYS )
 		exit
 	endif
 
-	diff message.txt.orign message.txt
+	diff message_orign.txt message.txt.dec
 	if( $? != 0 ) then
 		echo Message decrypted file is different
 		echo "!!!!!!!!!!!!!! FAILED !!!!!!!!!!!!!!!"
 		exit
 	endif
 
-	./${PROG} -d -kkeys/${KEY}.pem -omessage.txt.decrypted message.txt.enc
+	./${PROG} -tV -d -kkeys/${KEY}.pem -omessage.txt.decrypted message.txt.enc
 	if( $? == 0 ) then
 		echo Message decrypted ok
 	else
@@ -113,7 +115,7 @@ foreach KEY ( $KEYS )
 		exit
 	endif
 	
-	diff message.txt.orign message.txt.decrypted
+	diff message_orign.txt message.txt.decrypted
 	if( $? != 0 ) then
 		echo Message decrypted file is different
 		echo "!!!!!!!!!!!!!! FAILED !!!!!!!!!!!!!!!"

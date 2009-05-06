@@ -7,12 +7,12 @@
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * It is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
- * 
+ *
  * <http://www.gnu.org/licenses/>
  *
  *************************************************************************/
@@ -26,60 +26,61 @@
 
 #define VERSION_STRING VERSION_MAJOR "." VERSION_MINOR "." VERSION_REV
 
-typedef enum {
+extern const char* program_name;
+extern int verbose;
+extern int timing;
 
-	SUCCESS = 0,
-	FAIL,
-	BAD_PARAMS,
-	SIGNATURE_INVALID,
-	ENCRYPTION_FAILED,
-	DECRYPTION_FAILED,
-	NOT_IMPLEMENTED
+typedef enum
+{
+    SUCCESS = 0,
+    FAIL,
+    BAD_PARAMS,
+    SIGNATURE_INVALID,
+    ENCRYPTION_FAILED,
+    DECRYPTION_FAILED,
+    NOT_IMPLEMENTED
 } status;
 
-#define ERROR_LOG( mesg, params... )                             \
-	do {                                                     \
+#define ERROR_LOG( mesg, params... )                                \
+	do {                                                            \
 	printf( "ERROR: %s:%d - "  mesg, __FILE__, __LINE__, ##params );\
 	} while(0)
 
 
-#define DEBUG_LOG( mesg, params... )                             \
-	do {                                                     \
+#define DEBUG_LOG( mesg, params... )                                \
+	do {                                                            \
 	printf( "DEBUG: %s:%d - "  mesg, __FILE__, __LINE__, ##params );\
 	} while(0)
 
-#define INFO_LOG( mesg, params... )                             \
-	do {                                                     \
-	printf( "INFO: "  mesg, ##params );\
+#define INFO_LOG( mesg, params... )     \
+	do {                                \
+	printf( "INFO: "  mesg, ##params ); \
 	} while(0)
 
-
-extern int verbose;
-
-#define LOG( mesg, params... )                      \
-	do {                                        \
-		if( verbose )                       \
-			printf( "MESSAGE: " mesg, ##params );  \
+#define LOG( mesg, params... )                    \
+	do {                                          \
+		if( verbose )                             \
+			printf( "MESSAGE: " mesg, ##params ); \
 	} while(0)
 
-#define CHECK_PARAM( param )                                    \
-	do {                                                    \
-		if( param == NULL )                             \
-		{                                               \
+#define CHECK_PARAM( param )                                      \
+	do {                                                          \
+		if( param == NULL )                                       \
+		{                                                         \
 			ERROR_LOG("Invalid parameter: \"%s\" passed to funct" \
-				  " \"%s\"\n", #param, __FUNCTION__ ); \
-			assert( param != NULL );                \
-		}                                               \
+				  " \"%s\"\n", #param, __FUNCTION__ );            \
+			assert( param != NULL );                              \
+		}                                                         \
 	} while(0)
 
-#define FREE( data )          \
-do {                          \
-	if( data )            \
-	{                     \
+#define FREE( data )  \
+do {                  \
+	if( data )        \
+	{                 \
 		free(data);   \
 		data = NULL;  \
-	}                     \
-} while(0)	
+	}                 \
+} while(0)
 
 
 #define PEM_PUB_KEY_NAME "SPG PUBLIC KEY"
@@ -94,6 +95,6 @@ do {                          \
 #define MAX_BIG_NUM_SIZE 134 /* Max size of the big number in bytes. For curve secp521r1 it is 133 */
 #define MAX_FILE_NAME_SIZE 256
 #define SYM_CIPHER_DATA_UNIT_SIZE 1024
-#define ENCRYPTED_FILE_SUFFIX ".enc" 
+#define ENCRYPTED_FILE_SUFFIX ".enc"
 
 #endif /* _SPG_DEFS_H_ */

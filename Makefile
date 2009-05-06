@@ -5,7 +5,7 @@ UI_SOURCES = spg.c
 UI_OBJS = spg.o
 CC = gcc
 AR = ar
-LIBS = -lgcrypt -pthread -lssl -lcrypto -L./ -lspg
+LIBS = -lgcrypt -pthread -lssl -lcrypto -lrt -L./ -lspg
 PROG = spg
 SPG_LIB = libspg.a
 
@@ -27,6 +27,7 @@ clean:
 	rm -rf tests/message.txt.enc
 	rm -rf tests/message.txt.sign
 	rm -rf tests/message.txt.decrypted
+	rm -rf tests/message.txt.dec
 
 lib: ${OBJS}
 	${AR} -r ${SPG_LIB} ${OBJS}
@@ -39,5 +40,6 @@ test: $(PROG)
 	rm -rf tests/message.txt.enc
 	rm -rf tests/message.txt.sign
 	rm -rf tests/message.txt.decrypted
+	rm -rf tests/message.txt.dec
 	cp bin/$(PROG) tests/ && cd tests && ./tests.sh
 
