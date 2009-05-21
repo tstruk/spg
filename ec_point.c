@@ -24,24 +24,37 @@
 #include "ecc.h"
 #include "utils.h"
 
+/*
+ * Point init 
+ * Initializes the point to zero
+ */ 
 void ec_point_init( EC_point_t *p )
 {
     p->x = gcry_mpi_new(0);
     p->y = gcry_mpi_new(0);
 }
 
+/*
+ * Free point
+ */ 
 void ec_point_free( EC_point_t *p )
 {
     gcry_mpi_release(p->x);
     gcry_mpi_release(p->y);
 }
 
+/*
+ * Zero point
+ */ 
 void ec_point_zero(EC_point_t *p)
 {
     gcry_mpi_set_ui(p->x, 0);
     gcry_mpi_set_ui(p->y, 0);
 }
 
+/*
+ * Checks if the point is (0, 0)
+ */ 
 int ec_point_is_infinity(const EC_point_t *p)
 {
     if ( ( gcry_mpi_cmp_ui(p->x, 0) == 0 ) && ( gcry_mpi_cmp_ui(p->y, 0) == 0 ) )
@@ -49,6 +62,9 @@ int ec_point_is_infinity(const EC_point_t *p)
     return 0;
 }
 
+/*
+ * Copy point q to p
+ */ 
 void ec_point_copy(EC_point_t *p, const EC_point_t *q)
 {
     gcry_mpi_set(p->x, q->x);
@@ -92,11 +108,13 @@ int ec_point_on_curve(const EC_point_t *p, const GFp_params_t *params)
         gcry_mpi_release(t1);
         gcry_mpi_release(t2);
     }
-
     return (!res);
 }
 
-
+/*
+ * Point compare routine
+ *
+ */ 
 int ec_point_cmp( const EC_point_t *p, const EC_point_t *q )
 {
     if ( (gcry_mpi_cmp (p->x, q->x) == 0) && (gcry_mpi_cmp (p->y, q->y) == 0 ) )
@@ -243,7 +261,7 @@ status ec_point_sub( EC_point_t *r, const EC_point_t *q, EC_point_t *p, const GF
 }
 
 /*
- * Point multiply
+ * Point multiply 
  */
 EC_point_t ec_point_mulitply( const EC_point_t *p, const big_number d, const GFp_params_t *params  )
 {
@@ -251,7 +269,6 @@ EC_point_t ec_point_mulitply( const EC_point_t *p, const big_number d, const GFp
     EC_point_t q, p_cpy;
     ec_point_init(&q);
     ec_point_init(&p_cpy);
-
     ec_point_copy( &p_cpy, p);
 
     for (i = 0 ; i < gcry_mpi_get_nbits( d ); i++)

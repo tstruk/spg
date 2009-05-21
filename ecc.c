@@ -223,11 +223,10 @@ status ec_verify_signature( EC_public_key_t* public_key, EC_signature_t* sign, v
     CHECK_PARAM( data );
 
     get_time_stamp(&ecc_time_before_op);
-    /*
-     * Check point 1:
-     * 1. Verify that r and s are integers in [1,n - 1]. If not, the signature is invalid.
-     */
 
+    /*
+     * Verify that r and s are integers in [1,n - 1]. If not, the signature is invalid.
+     */
     if ( gcry_mpi_cmp( sign->r, public_key->c.params.n ) > 0 )
     {
         LOG("Signature not valid - R is not in range from 0 to n-1\n");
@@ -259,24 +258,33 @@ status ec_verify_signature( EC_public_key_t* public_key, EC_signature_t* sign, v
             ERROR_LOG("Init hash function failed\n");
             stat = FAIL;
         }
+        /*
+         * Calculate message digest e
+         */ 
         gcry_md_write (hash, data, size);
         gcry_md_final(hash);
         dgst = (char*) gcry_md_read(hash, 0);
         gcry_mpi_scan(&e, GCRYMPI_FMT_USG, dgst, SHA512_LEN, NULL);
         gcry_mpi_mod( e, e, public_key->c.params.n);
 
+        /* w = 1/s (mod n) */ 
         gcry_mpi_invm(w, sign->s, public_key->c.params.n);
+        /* u1 = ew (mod n) */
         gcry_mpi_mulm(u1, e, w, public_key->c.params.n );
+        /* u2 = rw (mod n) */
         gcry_mpi_mulm(u2, sign->r, w, public_key->c.params.n );
-
+        /* u1 * G */
         u1G = ec_point_mulitply( &public_key->c.params.G, u1, &public_key->c.params  );
+        /* u2 * Q */
         u2QA = ec_point_mulitply( &public_key->Q, u2, &public_key->c.params  );
-
+        /* P = (u1 * G) + (u2 * Q) */  
         ec_point_add( &P, &u1G, &u2QA, &public_key->c.params );
-
+        /* P = P (mod n) */
         gcry_mpi_mod( P.x, P.x, public_key->c.params.n);
+        
         get_time_stamp(&ecc_time_after_op);
-
+        
+        /* if r = P.x the signature is valid */
         if ( gcry_mpi_cmp( sign->r, P.x ) == 0 )
         {
             LOG("Signature is valid\n");

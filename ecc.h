@@ -81,7 +81,7 @@ typedef struct curve_over_GFp_s
 
 /*
  * Currently  will only use
- * curver over prime
+ * curves over prime
  */
 typedef GFp_curve_t curve;
 
