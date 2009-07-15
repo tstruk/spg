@@ -20,6 +20,8 @@
 #ifndef _SPG_CURVES_H_
 #define _SPG_CURVES_H_
 
+#define MAX_KEY_LEN 521
+
 typedef struct point_str_s
 {
     char* x;

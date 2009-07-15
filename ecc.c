@@ -54,24 +54,24 @@ status ec_generate_key(EC_private_key_t* priv_key, const char *curve_name)
         list_curves();
         return FAIL;
     }
-    priv_key->priv = gcry_mpi_new(0);
+    priv_key->priv = mpi_new(0);
     /*
      * Public key = random big number d * G
      * Randomize priv key d
      */
     inform_gather_random_data();
-    gcry_mpi_randomize ( priv_key->priv, gcry_mpi_get_nbits(c.params.n), GCRY_VERY_STRONG_RANDOM);
+    gcry_mpi_randomize ( priv_key->priv, mpi_get_nbits(c.params.n), GCRY_VERY_STRONG_RANDOM);
     inform_gather_random_data_done();
     get_time_stamp(&ecc_time_before_op);
     /*
      * Make sure d < n
      */
-    gcry_mpi_mod( priv_key->priv, priv_key->priv, c.params.n);
+    mpi_mod( priv_key->priv, priv_key->priv, c.params.n);
     /*
      * Compute G * d
      */
     priv_key->pub.c = c;
-    priv_key->pub.Q = ec_point_mulitply( &c.params.G, priv_key->priv, &c.params );
+    priv_key->pub.Q = ec_point_multiply( &c.params.G, priv_key->priv, &c.params );
     get_time_stamp(&ecc_time_after_op);
     print_time( &ecc_time_before_op, &ecc_time_after_op);
     return stat;
@@ -92,7 +92,7 @@ status ec_verify_key( EC_private_key_t* priv_key )
  */
 void ec_release_key(EC_private_key_t* priv_key)
 {
-    gcry_mpi_release(priv_key->priv);
+    mpi_release(priv_key->priv);
     ec_point_free(&priv_key->pub.Q);
     free_curve(&priv_key->pub.c);
 }
@@ -123,8 +123,8 @@ status ec_generate_signature( EC_private_key_t* priv_key, EC_signature_t* sign, 
     CHECK_PARAM( sign );
     CHECK_PARAM( data );
 
-    sign->r = gcry_mpi_new(0);
-    sign->s = gcry_mpi_new(0);
+    sign->r = mpi_new(0);
+    sign->s = mpi_new(0);
 
     if ( gcry_md_open(&hash, GCRY_MD_SHA512, 0) != GPG_ERR_NO_ERROR )
     {
@@ -134,7 +134,6 @@ status ec_generate_signature( EC_private_key_t* priv_key, EC_signature_t* sign, 
     gcry_md_write (hash, data, size);
     gcry_md_final(hash);
     dgst = (char*) gcry_md_read(hash, 0);
-    get_time_stamp(&ecc_time_before_op);
 
     do
     {
@@ -145,66 +144,68 @@ status ec_generate_signature( EC_private_key_t* priv_key, EC_signature_t* sign, 
             /*
              * Generate random k
              */
-            k = gcry_mpi_new(0);
-            gcry_mpi_randomize ( k, gcry_mpi_get_nbits(priv_key->pub.c.params.n),
+            k = mpi_new(0);
+            gcry_mpi_randomize ( k, mpi_get_nbits(priv_key->pub.c.params.n),
                                  GCRY_STRONG_RANDOM);
+            get_time_stamp(&ecc_time_before_op);
             /*
              * Make sure k < n
              */
-            gcry_mpi_mod( k, k, priv_key->pub.c.params.n);
+            mpi_mod( k, k, priv_key->pub.c.params.n);
             /*
              * compute kG = G * k
              */
-            kG = ec_point_mulitply( &priv_key->pub.c.params.G, k , &priv_key->pub.c.params );
+            kG = ec_point_multiply( &priv_key->pub.c.params.G, k , &priv_key->pub.c.params );
             /*
              * r = kG.x
              */
-            gcry_mpi_mod(sign->r, kG.x, priv_key->pub.c.params.n );
+            mpi_mod(sign->r, kG.x, priv_key->pub.c.params.n );
             ec_point_free(&kG);
             /*
              * if r != 0 then go farther
              */
-            if ( gcry_mpi_cmp_ui(sign->r, 0) == 0 )
+            if ( mpi_cmp_ui(sign->r, 0) == 0 )
             {
+                printf(" gen k not ok\n");
                 gen_k_ok = 0;
-                gcry_mpi_release(k);
+                mpi_release(k);
             }
         }
         while (!gen_k_ok);
-
         gcry_mpi_scan(&e, GCRYMPI_FMT_USG, dgst, SHA512_LEN, NULL);
         /*
          * Make sure e < n
          */
-        gcry_mpi_mod( e, e, priv_key->pub.c.params.n);
+        mpi_mod( e, e, priv_key->pub.c.params.n);
         /*
          * s = (e + (r * private_key) ) * 1/k
          */
-        gcry_mpi_mulm(sign->s, priv_key->priv, sign->r, priv_key->pub.c.params.n);
-        gcry_mpi_addm(sign->s, sign->s, e, priv_key->pub.c.params.n);
-        gcry_mpi_invm(e, k, priv_key->pub.c.params.n);
-        gcry_mpi_mulm(sign->s, sign->s, e, priv_key->pub.c.params.n);
-
+        mpi_mulm(sign->s, priv_key->priv, sign->r, priv_key->pub.c.params.n);
+        mpi_addm(sign->s, sign->s, e, priv_key->pub.c.params.n);
+        mpi_invm(e, k, priv_key->pub.c.params.n);
+        mpi_mulm(sign->s, sign->s, e, priv_key->pub.c.params.n);
+        get_time_stamp(&ecc_time_after_op);
         /*
          * if s != 0 then pair of unmbers
          * s and r are the valid signature
          */
-        if ( gcry_mpi_cmp_ui(sign->s, 0) == 0 )
+        if ( mpi_cmp_ui(sign->s, 0) == 0 )
         {
             gen_s_ok = 0;
-            gcry_mpi_release(k);
-            gcry_mpi_release(e);
+            mpi_release(k);
+            mpi_release(e);
         }
     }
     while (!gen_s_ok);
 
-    get_time_stamp(&ecc_time_after_op);
     print_time( &ecc_time_before_op, &ecc_time_after_op);
-    gcry_mpi_release(k);
-    gcry_mpi_release(e);
+    mpi_release(k);
+    mpi_release(e);
     gcry_md_close(hash);
     return stat;
 }
+
+
 /* TODO: add comments in the algorithm code
  * ec_verify_signature()
  * The algorithm is as follows:
@@ -223,17 +224,18 @@ status ec_verify_signature( EC_public_key_t* public_key, EC_signature_t* sign, v
     CHECK_PARAM( data );
 
     get_time_stamp(&ecc_time_before_op);
-
     /*
-     * Verify that r and s are integers in [1,n - 1]. If not, the signature is invalid.
+     * Check point 1:
+     * 1. Verify that r and s are integers in [1,n - 1]. If not, the signature is invalid.
      */
-    if ( gcry_mpi_cmp( sign->r, public_key->c.params.n ) > 0 )
+
+    if ( mpi_cmp( sign->r, public_key->c.params.n ) > 0 )
     {
         LOG("Signature not valid - R is not in range from 0 to n-1\n");
         stat = FAIL;
     }
     if ( (stat == SUCCESS) &&
-            ( ! ( gcry_mpi_cmp( sign->s, public_key->c.params.n ) < 0 ) ) )
+            ( ! ( mpi_cmp( sign->s, public_key->c.params.n ) < 0 ) ) )
     {
         LOG("Signature not valid - S is not in range from 0 to n-1\n");
         stat = FAIL;
@@ -247,10 +249,9 @@ status ec_verify_signature( EC_public_key_t* public_key, EC_signature_t* sign, v
 
         EC_point_t u1G, u2QA, P;
 
-        w  = gcry_mpi_new(0);
-        u1 = gcry_mpi_new(0);
-        u2 = gcry_mpi_new(0);
-
+        w  = mpi_new(0);
+        u1 = mpi_new(0);
+        u2 = mpi_new(0);
         ec_point_init( &P );
 
         if ( gcry_md_open(&hash, GCRY_MD_SHA512, 0) != GPG_ERR_NO_ERROR )
@@ -258,34 +259,23 @@ status ec_verify_signature( EC_public_key_t* public_key, EC_signature_t* sign, v
             ERROR_LOG("Init hash function failed\n");
             stat = FAIL;
         }
-        /*
-         * Calculate message digest e
-         */ 
         gcry_md_write (hash, data, size);
         gcry_md_final(hash);
         dgst = (char*) gcry_md_read(hash, 0);
         gcry_mpi_scan(&e, GCRYMPI_FMT_USG, dgst, SHA512_LEN, NULL);
-        gcry_mpi_mod( e, e, public_key->c.params.n);
+        mpi_mod( e, e, public_key->c.params.n);
 
-        /* w = 1/s (mod n) */ 
-        gcry_mpi_invm(w, sign->s, public_key->c.params.n);
-        /* u1 = ew (mod n) */
-        gcry_mpi_mulm(u1, e, w, public_key->c.params.n );
-        /* u2 = rw (mod n) */
-        gcry_mpi_mulm(u2, sign->r, w, public_key->c.params.n );
-        /* u1 * G */
-        u1G = ec_point_mulitply( &public_key->c.params.G, u1, &public_key->c.params  );
-        /* u2 * Q */
-        u2QA = ec_point_mulitply( &public_key->Q, u2, &public_key->c.params  );
-        /* P = (u1 * G) + (u2 * Q) */  
-        ec_point_add( &P, &u1G, &u2QA, &public_key->c.params );
-        /* P = P (mod n) */
-        gcry_mpi_mod( P.x, P.x, public_key->c.params.n);
+        mpi_invm(w, sign->s, public_key->c.params.n);
+        mpi_mulm(u1, e, w, public_key->c.params.n );
+        mpi_mulm(u2, sign->r, w, public_key->c.params.n );
+
+        u1G = ec_point_multiply( &public_key->c.params.G, u1, &public_key->c.params  );
+        u2QA = ec_point_multiply( &public_key->Q, u2, &public_key->c.params  );
+        ec_point_add_affine(&u1G, &u1G, &u2QA, &public_key->c.params );
         
         get_time_stamp(&ecc_time_after_op);
-        
-        /* if r = P.x the signature is valid */
-        if ( gcry_mpi_cmp( sign->r, P.x ) == 0 )
+
+        if ( mpi_cmp( sign->r, u1G.x ) == 0 )
         {
             LOG("Signature is valid\n");
         }
@@ -296,15 +286,13 @@ status ec_verify_signature( EC_public_key_t* public_key, EC_signature_t* sign, v
         }
         print_time( &ecc_time_before_op, &ecc_time_after_op);
         gcry_md_close(hash);
-        gcry_mpi_release( w );
-        gcry_mpi_release( e );
-        gcry_mpi_release( u1 );
-        gcry_mpi_release( u2 );
-
+        mpi_release( w );
+        mpi_release( e );
+        mpi_release( u1 );
+        mpi_release( u2 );
         ec_point_free( &u1G );
         ec_point_free( &u2QA );
         ec_point_free( &P );
-
     }
     return stat;
 }
@@ -315,8 +303,8 @@ status ec_verify_signature( EC_public_key_t* public_key, EC_signature_t* sign, v
 void ec_release_signature(EC_signature_t* signature )
 {
     CHECK_PARAM( signature );
-    gcry_mpi_release(signature->r);
-    gcry_mpi_release(signature->s);
+    mpi_release(signature->r);
+    mpi_release(signature->s);
     return;
 }
 
@@ -407,36 +395,36 @@ status ec_generate_enc_key( EC_enc_key_t* enc_key, EC_public_key_t* public_key )
     do
     {
         gen_k_ok = 1;
-        k = gcry_mpi_new(0);
-        h = gcry_mpi_set_ui( NULL, public_key->c.params.h );
+        k = mpi_new(0);
+        h = mpi_set_ui( NULL, public_key->c.params.h );
         /*
          * Generate random k
          */
-        gcry_mpi_randomize ( k, gcry_mpi_get_nbits(public_key->c.params.n),
+        gcry_mpi_randomize ( k, mpi_get_nbits(public_key->c.params.n),
                              GCRY_STRONG_RANDOM);
         /*
          * Make sure k < n
          */
-        gcry_mpi_mod( k, k, public_key->c.params.n);
+        mpi_mod( k, k, public_key->c.params.n);
 
         /*
          * enc_key.R = k * G
          */
-        enc_key->R = ec_point_mulitply( &public_key->c.params.G, k, &public_key->c.params );
+        enc_key->R = ec_point_multiply( &public_key->c.params.G, k, &public_key->c.params );
 
-        gcry_mpi_mul_ui( k, k, public_key->c.params.h );
+        mpi_mul_ui( k, k, public_key->c.params.h );
 
-        Z = ec_point_mulitply( &public_key->Q, k, &public_key->c.params );
+        Z = ec_point_multiply( &public_key->Q, k, &public_key->c.params );
 
 
         /*
          * if Z == 0 the generate k again
          */
-        if ( ec_point_is_infinity( &Z ) )
+        if ( ec_point_is_infinity_affine( &Z ) )
         {
             gen_k_ok = 0;
-            gcry_mpi_release( k );
-            gcry_mpi_release( h );
+            mpi_release( k );
+            mpi_release( h );
             ec_point_free( &Z );
             ec_point_free( &enc_key->R );
         }
@@ -451,8 +439,8 @@ status ec_generate_enc_key( EC_enc_key_t* enc_key, EC_public_key_t* public_key )
     get_time_stamp(&ecc_time_after_op);
     print_time( &ecc_time_before_op, &ecc_time_after_op);
 
-    gcry_mpi_release( k );
-    gcry_mpi_release( h );
+    mpi_release( k );
+    mpi_release( h );
     ec_point_free( &Z );
 
     return stat;
@@ -470,23 +458,23 @@ status ec_generate_dec_key( EC_enc_key_t* enc_key, EC_private_key_t* priv_key )
     CHECK_PARAM( enc_key );
     CHECK_PARAM( priv_key );
 
-    hd = gcry_mpi_new(0);
+    hd = mpi_new(0);
     get_time_stamp(&ecc_time_before_op);
 
-    gcry_mpi_mul_ui(hd, priv_key->priv, priv_key->pub.c.params.h );
-    Z = ec_point_mulitply( &enc_key->R , hd, &priv_key->pub.c.params );
+    mpi_mul_ui(hd, priv_key->priv, priv_key->pub.c.params.h );
+    Z = ec_point_multiply( &enc_key->R , hd, &priv_key->pub.c.params );
 
-    if ( ec_point_is_infinity( &Z ) )
+    if ( ec_point_is_infinity_affine( &Z ) )
     {
         ec_point_free( &Z );
-        gcry_mpi_release( hd );
+        mpi_release( hd );
         return FAIL;
     }
 
     stat = ec_sym_key_derive( enc_key, Z.x );
     get_time_stamp(&ecc_time_after_op);
     print_time( &ecc_time_before_op, &ecc_time_after_op);
-    gcry_mpi_release( hd );
+    mpi_release( hd );
     ec_point_free( &Z );
     return stat;
 }

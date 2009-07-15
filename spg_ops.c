@@ -222,6 +222,10 @@ static status read_private_key(EC_private_key_t* private_key, char* in_file)
                     stat = FAIL;
                 }
             }
+#ifdef JACOBIAN_COORDINATES 
+            private_key->pub.Q.z = mpi_new(0);
+            mpi_set_ui(private_key->pub.Q.z, 1);
+#endif            
             if ( SUCCESS == stat )
             {
                 /*
@@ -417,6 +421,10 @@ static status read_public_key ( EC_public_key_t* public_key, char* in_file )
                     stat = FAIL;
                 }
             }
+#ifdef JACOBIAN_COORDINATES 
+            public_key->Q.z = mpi_new(0);
+            mpi_set_ui(public_key->Q.z, 1);
+#endif             
             if ( SUCCESS == stat )
             {
                 char curve_name[1024];
@@ -652,15 +660,7 @@ status generate_signature( char* input, char* output, char* message )
         fclose(msg);
         return FAIL;
     }
-
-    /*
-    * TODO: Can this be read in one go ???
-    */
-    do
-    {
-        dummy = fread( msg_buffer, 1, (size_t) msg_size, msg );
-    }
-    while ( 0 );
+    dummy = fread( msg_buffer, 1, (size_t) msg_size, msg );
 
     if ( ( stat = read_private_key(&priv_key, input) ) != SUCCESS )
     {
@@ -728,12 +728,7 @@ status verify_signature( char* input, char* output, char* message )
         return FAIL;
     }
 
-    do
-    {
-        dummy = fread( msg_buffer, 1, (size_t) msg_size, msg );
-    }
-    while ( 0 );
-
+    dummy = fread( msg_buffer, 1, (size_t) msg_size, msg );
 
     if ( ( stat = read_public_key(&pub_key, input) ) != SUCCESS )
     {
@@ -936,7 +931,6 @@ status encrypt( char* key_file, char* file_to_encrypt )
             ERROR_LOG( "Failed initialise symmectic cipher\n" );
         }
     }
-
     /*
      * We done - do cleanup
      */
@@ -1065,7 +1059,15 @@ status decrypt( char* key_file, char* file_to_decrypt, char* output )
             {
                 ERROR_LOG("Read data failed R.y");
                 stat = FAIL;
+            
             }
+#ifdef JACOBIAN_COORDINATES
+            else
+            {
+                enc_key.R.z = mpi_new(0);
+                mpi_set_ui( enc_key.R.z, 1);
+            }
+#endif            
         }
     }
     if ( SUCCESS == stat )

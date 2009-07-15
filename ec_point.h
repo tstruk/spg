@@ -22,90 +22,93 @@
 
 typedef gcry_mpi_t big_number;
 
-/*
- * EC Point Structue
- */ 
 typedef struct EC_point_s
 {
     big_number x;
     big_number y;
+#ifdef JACOBIAN_COORDINATES    
+    big_number z;
+#endif
 } EC_point_t;
 
-/*
- * Will use domain parameters for Elliptic Curves over over prime Fp only.
- * Elliptic Curves over binary F2m is to be implemented 
- */ 
 struct domain_GFp_params_s;
 typedef struct domain_GFp_params_s GFp_params_t;
 
 /*
- * Function: ec_point_is_infinity
+ * Function:
  *
  */
-int ec_point_is_infinity(const EC_point_t *p);
+int ec_point_is_infinity_affine(const EC_point_t *p);
 
 /*
- * Function: ec_point_init
+ * Function:
  *
  */
 void ec_point_init( EC_point_t *p );
 
 /*
- * Function: ec_point_free
+ * Function:
  *
  */
 void ec_point_free( EC_point_t *p );
 
 /*
- * Function: ec_point_zero
+ * Function:
  *
  */
 void ec_point_zero(EC_point_t *p);
 
 /*
- * Function: ec_point_copy
+ * Function:
  *
  */
 void ec_point_copy(EC_point_t *p, const EC_point_t *q);
 
 /*
- * Function: ec_point_on_curve
+ * Function:
  *
  */
 int ec_point_on_curve(const EC_point_t *p, const GFp_params_t *params);
 
 /*
- * Function: ec_point_add
+ * Function:
  *
  */
-status ec_point_add( EC_point_t *r, const EC_point_t *q,
+status ec_point_add_affine( EC_point_t *r, const EC_point_t *q,
                      const EC_point_t *p, const GFp_params_t *params );
-
 /*
- * Function: ec_point_double
+ * Function:
  *
  */
-status ec_point_double( EC_point_t *r, const EC_point_t *p,
+status ec_point_double_affine( EC_point_t *r, const EC_point_t *p,
                         const GFp_params_t *params );
 
 /*
- * Function: ec_point_mulitply
+ * Function:
  *
  */
-EC_point_t ec_point_mulitply(const EC_point_t *p, const big_number d,
+EC_point_t ec_point_multiply(const EC_point_t *p, const big_number d,
                              const GFp_params_t *params  );
 
 /*
- * Function: ec_point_sub
+ * Function:
  *
  */
 status ec_point_sub( EC_point_t *r, const EC_point_t *q,
-                     EC_point_t *p, const GFp_params_t *params );
+                     const EC_point_t *p, const GFp_params_t *params );
 
 /*
- * Function: ec_debug_print_point
+ * Function:
  *
  */
 void ec_debug_print_point(const EC_point_t const *p );
 
+#ifdef JACOBIAN_COORDINATES
+/*
+ * Function:
+ *
+ */
+//void ec_point_jacobian_to_affine( EC_point_t *r, const EC_point_t *p,
+//                                  const GFp_params_t *params );
+#endif
 #endif

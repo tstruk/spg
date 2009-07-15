@@ -4,5 +4,4 @@
 1. Implment key generation by lenth      High
 2. Create scons biuld script             Low
 3. Add timing for ECC                    High
-4. Check help for -v                     Low
 

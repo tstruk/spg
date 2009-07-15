@@ -5,9 +5,28 @@ UI_SOURCES = spg.c
 UI_OBJS = spg.o
 CC = gcc
 AR = ar
-LIBS = -lgcrypt -pthread -lssl -lcrypto -lrt -L./ -lspg
+LIBS = -lgcrypt -pthread -lssl -lcrypto -lrt -lm -L./ -lspg
 PROG = spg
 SPG_LIB = libspg.a
+#######################################
+# Uncomment or comment out the line below to use/not use 
+# Jacobian coordinates. If you want to use affine coordinates
+# the line should be commented out, but jacobian coordnates work
+# much faster
+
+EXTRA_FLAGS = -DJACOBIAN_COORDINATES 
+
+############################################
+# Uncomment one of the three following lines
+# to use one of the three multiplication 
+# algorithms. NOTE: only one can be defined
+############################################
+
+MULTIPLICATION_ALGORYTHM += -DLEFT_TO_RIGH_MULT
+#MULTIPLICATION_ALGORYTHM += -DBINARY_NAF_MULT 
+#MULTIPLICATION_ALGORYTHM += -DWINDOW_NAF_MULT
+
+EXTRA_FLAGS += ${MULTIPLICATION_ALGORYTHM}
 
 all: $(PROG)
 	
@@ -23,7 +42,7 @@ clean:
 	rm -rf bin/*
 	rm -rf *~
 	rm -rf tests/$(PROG)
-	rm -rf tests/keys/*
+#	rm -rf tests/keys/*
 	rm -rf tests/message.txt.enc
 	rm -rf tests/message.txt.sign
 	rm -rf tests/message.txt.decrypted
@@ -33,10 +52,9 @@ lib: ${OBJS}
 	${AR} -r ${SPG_LIB} ${OBJS}
 
 .c.o:
-	${CC} ${CFLAGS} ${INCLUDES} -c $<
+	${CC} ${CFLAGS} ${EXTRA_FLAGS} ${INCLUDES} -c $<
 
 test: $(PROG)
-	rm -rf tests/keys/*
 	rm -rf tests/message.txt.enc
 	rm -rf tests/message.txt.sign
 	rm -rf tests/message.txt.decrypted

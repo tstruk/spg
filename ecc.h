@@ -80,8 +80,8 @@ typedef struct curve_over_GFp_s
 } GFp_curve_t;
 
 /*
- * Currently  will only use
- * curves over prime
+ * Currently will only use
+ * curve over prime
  */
 typedef GFp_curve_t curve;
 
@@ -113,7 +113,7 @@ typedef struct EC_signature_s
 } EC_signature_t;
 
 /*
- * Message signature structure
+ * Encryption key structure 
  */
 typedef struct EC_enc_key_s
 {
