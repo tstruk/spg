@@ -136,36 +136,26 @@ status ec_point_double_affine( EC_point_t *r, const EC_point_t *p, const GFp_par
 
     /* t1 = xp^2 */
     mpi_mulm(t1, p->x, p->x, params->p);
-
     /* t2 = 3* xp^2 */
     mpi_addm(t2, t1, t1, params->p);
     mpi_addm(t2, t2, t1, params->p);
-
     /* s = 3 * xp^2 + a */
     mpi_addm(s, t2, params->a, params->p);
-
     /* t2 = 2*yp */
     mpi_addm(t2, p->y, p->y, params->p);
-
     /* t2 = 1 / 2yp */
     mpi_invm( t2, t2, params->p );
-
     /* s = 3xp^2 + a / 2yp */
     mpi_mulm(s, s, t2, params->p);
-
     /* t1 = s ^ 2 */
     mpi_mulm(t1, s, s, params->p);
-
     /* t1 (xr) = s^2 - 2 * xp */
     mpi_subm(t1, t1, p->x, params->p);
     mpi_subm(t1, t1, p->x, params->p);
-
     /* t2 = xp - xr */
     mpi_subm( t2, p->x, t1, params->p);
-
     /* t2 = s * (xp - xr) */
     mpi_mulm(t2, s, t2, params->p);
-
     /* yr = -yp + s * (xp - xr) */
     mpi_subm(r->y, t2, p->y, params->p);
     /* xr = s^2 - 2 * xp*/
@@ -264,15 +254,10 @@ static int ec_point_is_infinity_jacobian(const EC_point_t *p)
  * Junko Nakajima, and Mitsuru Matsui with my modification to steps
  * 15, 16, 17 & 18 to avoid expensive division as noted in the code.
  *
- * The algorithm goes as follows
- * S = 4*X*Y^2
- * M = 3*X^2 + a*Z^4
- * X' = M^2 - 2*S
- * Y' = M*(S - X') - 8*Y^4
- * Z' = 2*Y*Z
- * return (X', Y', Z')
+ * NOTE: the implementation works only 
+ * for curvers where a = p - 3 see
+ * www.secg.org SEC 2: Recommended Elliptic Curve Domain Parameters
  */ 
-
 status ec_point_double_jacobian( EC_point_t *r, const EC_point_t *p, const GFp_params_t *params )
 {
   
@@ -338,7 +323,10 @@ status ec_point_double_jacobian( EC_point_t *r, const EC_point_t *p, const GFp_p
     return stat;
 }
 
-/* 
+/*
+ * Point addition routine using jacobian coordinates
+ * Formula 3.14 in "Guide to Elliptic Curve Cryptography"
+ *
  *  U1 = X1*Z2^2
  *  T1 = X2*Z1^2
  *  S1 = Y1*Z2^3

@@ -1,11 +1,11 @@
-CFLAGS = -g -Wall -O2
+CFLAGS = -Wall -O2
 SOURCES = curves.c ecc.c ec_point.c spg_ops.c utils.c sym_cipher.c help.c
 OBJS = curves.o ecc.o ec_point.o spg_ops.o utils.o sym_cipher.o help.o
 UI_SOURCES = spg.c
 UI_OBJS = spg.o
 CC = gcc
 AR = ar
-LIBS = -lgcrypt -pthread -lssl -lcrypto -lrt -lm -L./ -lspg
+LIBS = -lgcrypt -pthread -lcrypto -lrt -lm -L./ -lspg
 PROG = spg
 SPG_LIB = libspg.a
 #######################################
@@ -23,7 +23,7 @@ EXTRA_FLAGS = -DJACOBIAN_COORDINATES
 ############################################
 
 MULTIPLICATION_ALGORYTHM += -DLEFT_TO_RIGH_MULT
-#MULTIPLICATION_ALGORYTHM += -DBINARY_NAF_MULT 
+#MULTIPLICATION_ALGORYTHM += -DBINARY_NAF_MULT
 #MULTIPLICATION_ALGORYTHM += -DWINDOW_NAF_MULT
 
 EXTRA_FLAGS += ${MULTIPLICATION_ALGORYTHM}
@@ -42,7 +42,7 @@ clean:
 	rm -rf bin/*
 	rm -rf *~
 	rm -rf tests/$(PROG)
-#	rm -rf tests/keys/*
+	rm -rf tests/keys/*
 	rm -rf tests/message.txt.enc
 	rm -rf tests/message.txt.sign
 	rm -rf tests/message.txt.decrypted

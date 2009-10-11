@@ -89,7 +89,7 @@ void inform_gather_random_data()
     int res = 0 ;
     done = 0;
     printf("Going to gather random data. It can take a few seconds.\n");
-    printf("It is recomended that you perform some other work e.g."
+    printf("It is recommended that you perform some other work e.g."
            " move mouse and type in on keyboard.\n");
     res = pthread_create( &thread, NULL,  inform , NULL);
 }
@@ -132,7 +132,7 @@ void print_time(const time_stamp_t *before, const time_stamp_t *after)
         }
         else
         {
-            if ( before->time_v.tv_sec < after->time_v.tv_nsec  )
+            if ( before->time_v.tv_nsec < after->time_v.tv_nsec  )
             {
                 printf("Operation time: %d.%06d sec in %llu CPU cycles.\n",
                        (unsigned int)(after->time_v.tv_sec - before->time_v.tv_sec),

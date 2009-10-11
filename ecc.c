@@ -29,9 +29,6 @@
 #include "utils.h"
 
 /*
- * TODO add comments
- */
-/*
  * Structures used for time measurment
  */
 static time_stamp_t ecc_time_before_op;

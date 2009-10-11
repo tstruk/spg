@@ -101,7 +101,7 @@ static status do_operation( operation op, operation_params_t* params )
         }
         else
         {
-            INFO_LOG("Signature generated successfuly\n");
+            INFO_LOG("Signature generated successfully\n");
         }
 
         break;
@@ -306,7 +306,7 @@ int main(int argc, char** argv)
             }
             if ( NULL == params.output )
             {
-                INFO_LOG("Signature file will be sored under the "
+                INFO_LOG("Signature file will be stored under the "
                          "default file name: %s\n", default_priv_key );
                 params.output = (char*)default_signature;
             }

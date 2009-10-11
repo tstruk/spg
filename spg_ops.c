@@ -122,7 +122,7 @@ status generate_keys( char* curve_name, char* out_file )
             if ( ( SUCCESS == stat ) && ( PEM_write(file, PEM_PRV_KEY_NAME, PEM_EMPTY_STR,
                                                     (void*) key_buff, space ) ) )
             {
-                LOG("Private key generated successfuly - %d bytes written to %s file\n", space, out_file );
+                LOG("Private key generated successfully - %d bytes written to %s file\n", space, out_file );
             }
             else
             {
@@ -330,7 +330,7 @@ static status write_public_key( EC_public_key_t* public_key, char* out_file )
         if ( ( SUCCESS == stat ) && ( PEM_write(file, PEM_PUB_KEY_NAME, PEM_EMPTY_STR,
                                                 (void*) key_buff, space ) ) )
         {
-            LOG("Public key exported successfuly - %d bytes written to %s file\n", space, out_file );
+            LOG("Public key exported successfully - %d bytes written to %s file\n", space, out_file );
         }
         else
         {
@@ -519,7 +519,7 @@ static status write_signature( EC_signature_t* signature, char* output )
     if ( ( SUCCESS == stat ) && ( PEM_write(out_file, PEM_SIGN_NAME, PEM_EMPTY_STR,
                                             (void*) key_buff, space ) ) )
     {
-        LOG("Signature generated successfuly - %d bytes written to %s file\n", space, output );
+        LOG("Signature generated successfully - %d bytes written to %s file\n", space, output );
     }
     else
     {
@@ -695,22 +695,20 @@ status verify_signature( char* input, char* output, char* message )
     long msg_size = 0;
     int dummy;
 
-
     CHECK_PARAM( input );
     CHECK_PARAM( output );
     CHECK_PARAM( message );
-
 
     FILE *msg = fopen(message, "r");
     if (!msg)
     {
         ERROR_LOG("Can not open message file %s\n", message);
         return FAIL;
-
     }
+
     fseek(msg, 0, SEEK_END);
     msg_size = ftell( msg );
-
+    
     if ( MAX_MSG_SIZE < msg_size )
     {
         ERROR_LOG("Max message size is " MAX_MSG_SIZE_STR "\n");
@@ -1041,8 +1039,23 @@ status decrypt( char* key_file, char* file_to_decrypt, char* output )
          * Read from encrypted file the R point
          */
         big_number_size = fgetc( f_to_dec );
+        if(big_number_size == EOF)
+        {
+            /* file is empty */
+            ERROR_LOG("The file to encrypt is an empty file\n");
+            fclose(f_to_dec);
+            fclose(f_dec);
+            return FAIL;
+        }
         dummy = fread( big_number_buffer, 1, (size_t) big_number_size, f_to_dec );
+        if(dummy != big_number_size)
+        {
+            ERROR_LOG("Reading the encrypted file failed\n");
+            fclose(f_to_dec);
+            fclose(f_dec);
+            return FAIL;
 
+        }
         if ( gcry_mpi_scan( &enc_key.R.x, GCRYMPI_FMT_USG,
                             big_number_buffer, (size_t) big_number_size, NULL) != GPG_ERR_NO_ERROR )
         {
@@ -1052,8 +1065,25 @@ status decrypt( char* key_file, char* file_to_decrypt, char* output )
         else
         {
             big_number_size = fgetc( f_to_dec );
+            if(big_number_size == EOF)
+            {
+                /* file is empty */
+                ERROR_LOG("The encrypted file is corrupted\n");
+                fclose(f_to_dec);
+                fclose(f_dec);
+                mpi_release(enc_key.R.x);
+                return FAIL;
+            }
             dummy = fread( big_number_buffer, 1, (size_t) big_number_size, f_to_dec );
 
+            if(dummy != big_number_size)
+            {
+                ERROR_LOG("Reading the encrypted file failed\n");
+                fclose(f_to_dec);
+                fclose(f_dec);
+                mpi_release(enc_key.R.x);
+                return FAIL;
+            }
             if ( gcry_mpi_scan( &enc_key.R.y, GCRYMPI_FMT_USG,
                                 big_number_buffer, (size_t) big_number_size, NULL) != GPG_ERR_NO_ERROR )
             {
@@ -1178,7 +1208,7 @@ status decrypt( char* key_file, char* file_to_decrypt, char* output )
                 fflush( f_dec );
                 if ( memcmp( hmac_buff, hmac_buff_from_file, SHA1_LEN ) == 0)
                 {
-                    INFO_LOG("File decrypted successufuly\n");
+                    INFO_LOG("File decrypted successfully\n");
                 }
                 else
                 {

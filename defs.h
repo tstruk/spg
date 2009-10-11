@@ -22,7 +22,7 @@
 
 #define VERSION_MAJOR "0"
 #define VERSION_MINOR "4"
-#define VERSION_REV   "2"
+#define VERSION_REV   "8"
 
 #define VERSION_STRING VERSION_MAJOR "." VERSION_MINOR "." VERSION_REV
 

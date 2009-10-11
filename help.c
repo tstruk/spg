@@ -69,7 +69,7 @@ static void verify_help(void)
 {
     printf("\n SPG " VERSION_STRING "\n\n");
     printf("\nHelp for Verify Signature operation \n"  );
-    printf("\nUse: %s -v -k<public key> -i<public key> message_file",program_name );
+    printf("\nUse: %s -v -k<public key> -i<signature file> message_file",program_name );
     printf("\nparameters:");
     printf("\n -k<public key>     - Valid public key exported from private key with -x command");
     printf("\n -i<signature file> - File name where the signature is stored" );
@@ -96,7 +96,7 @@ static void decrypt_help(void)
     printf("\nparameters:");
     printf("\n -k<private key>    - Valid private key file generated with -g command");
     printf("\n -o<encrypted file> - If the file_to_decrypt file has \".enc\" suffix then the parameter is optional.\n"
-           "                      If not the it has to be provided and the decrypted file will be stored in this file." );
+           "                        Otherwise it has to be provided and the decrypted file will be stored in this file." );
     printf("\n file_to_decrypt    - File to be decrypted\n\n" );
 }
 
@@ -104,7 +104,7 @@ static help_t operations[ ] =
 {
     { "gen_key", gen_key_help },
     { "gen", gen_key_help },
-    { "export", export_key_help },
+    { "xport", export_key_help },
     { "sign", sign_help },
     { "verify", verify_help },
     { "ver", verify_help },
@@ -134,11 +134,12 @@ void print_help ( void )
            "   -h --help             Print help and exit\n"
           );
     printf("Options are: \n"
-           "   -c --curve           Use this curve\n"
-           "   -i --input           Input file\n"
-           "   -o --output          Output file\n"
-           "   -V --verbose         Be loud\n"
-           "   -t --timing          Print time spent computing ecc algorythms\n"
+           "   -c --curve            Specifies elliptic curve to use\n"
+           "   -i --input            Specifies input file\n"
+           "   -k --input            Specifies key input file\n"
+           "   -o --output           Specifies output file\n"
+           "   -V --verbose          Turn on the verbose mode\n"
+           "   -t --timing           Print time spent computing ecc algorithms\n"
           );
     printf("\nFor more help on commands use: \n%s --help <command> \n", program_name );
     printf("\nE.g. \n%s --help sign\n\n", program_name );
