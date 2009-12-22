@@ -158,6 +158,15 @@ static status do_operation( operation op, operation_params_t* params )
     return stat;
 }
 
+static status init_gcrypt_lib(void)
+{
+    if (!gcry_check_version (NULL))
+        return FAIL;
+    gcry_control (GCRYCTL_DISABLE_SECMEM, 0);
+    gcry_control (GCRYCTL_INITIALIZATION_FINISHED, 0);
+    return SUCCESS;
+}
+
 int main(int argc, char** argv)
 {
     status stat = SUCCESS;
@@ -172,6 +181,11 @@ int main(int argc, char** argv)
     memset( &params, '\0', sizeof(params));
     params.cipher = SYM_CIPHER_BLOWFISH;
 
+    if(SUCCESS != init_gcrypt_lib())
+    {
+        ERROR_LOG("gcrypt library initialization failed\n");
+        return FAIL;
+    }
     /*
      * Possible user params are
      */
