@@ -7,38 +7,38 @@ echo "RUNNING TESTS"
 ########################
 # Test generating key
 ########################
-foreach KEY ( $KEYS )
-echo "######### ${KEY} #################"
-	./${PROG} -t -g -c ${KEY} -okeys/${KEY}.pem
+#foreach KEY ( $KEYS )
+#echo "######### ${KEY} #################"
+#	./${PROG} -t -g -c ${KEY} -okeys/${KEY}.pem
 #	ls -l keys/${KEY}.pem
-
-	if( $? == 0 ) then
-		echo ${KEY} generated ok
-	else
-		echo Gen key ${KEY} failed
-		echo "!!!!!!!!!!!!!! FAILED !!!!!!!!!!!!!!!"
-		exit
-	endif
-end
+#
+#	if( $? == 0 ) then
+#		echo ${KEY} generated ok
+#	else
+#		echo Gen key ${KEY} failed
+#		echo "!!!!!!!!!!!!!! FAILED !!!!!!!!!!!!!!!"
+#		exit
+#	endif
+#end
 
 ########################
 # Test exporting key
 ########################
-echo "##################################"
-echo "Exporting public Keys"
-echo "##################################"
+#echo "##################################"
+#echo "Exporting public Keys"
+#echo "##################################"
 
-foreach KEY ( $KEYS )
-echo "######### ${KEY} #################"
-	./${PROG} -t -x -kkeys/${KEY}.pem -okeys/public_${KEY}.pem
-	if( $? == 0 ) then
-		echo ${KEY} key exported ok
-	else
-		echo Key export ${KEY} failed
-		echo "!!!!!!!!!!!!!! FAILED !!!!!!!!!!!!!!!"
-		exit
-	endif
-end
+#foreach KEY ( $KEYS )
+#echo "######### ${KEY} #################"
+#	./${PROG} -t -x -kkeys/${KEY}.pem -okeys/public_${KEY}.pem
+#	if( $? == 0 ) then
+#		echo ${KEY} key exported ok
+#	else
+#		echo Key export ${KEY} failed
+#		echo "!!!!!!!!!!!!!! FAILED !!!!!!!!!!!!!!!"
+#		exit
+#	endif
+#end
 
 ########################
 # Test singing message

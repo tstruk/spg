@@ -64,7 +64,7 @@ static curve_t curves_tab[] =
         /* h */
         1
     },
-#if 0    
+#if 0
     /*
      * Curve secp112r2
      */
@@ -94,7 +94,7 @@ static curve_t curves_tab[] =
         /* h */
         4
     },
-#endif    
+#endif
     /*
      * Curve secp128r1
      */
@@ -154,7 +154,7 @@ static curve_t curves_tab[] =
         /* h */
         4
     },
-#endif    
+#endif
     /*
      * Curve secp160r1
      */
@@ -414,10 +414,10 @@ status populate_curve( curve* c ,curve_t* c_tab)
     {
         return FAIL;
     }
-#ifdef JACOBIAN_COORDINATES     
+#ifdef JACOBIAN_COORDINATES
     c->params.G.z = mpi_new(0);
     mpi_set_ui(c->params.G.z, 1);
-#endif    
+#endif
     c->params.h = c_tab->h;
     return stat;
 }
@@ -431,7 +431,7 @@ void free_curve(curve *c)
     mpi_release( c->params.b );
     mpi_release( c->params.G.x );
     mpi_release( c->params.G.y );
-#ifdef JACOBIAN_COORDINATES     
+#ifdef JACOBIAN_COORDINATES
     mpi_release( c->params.G.z );
 #endif
     mpi_release( c->params.n );
