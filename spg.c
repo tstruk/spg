@@ -21,6 +21,9 @@
 #include <string.h>
 #include <getopt.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <dirent.h>
 #include <gcrypt.h>
 #include <openssl/pem.h>
 #include <openssl/hmac.h>
@@ -167,20 +170,90 @@ static status init_gcrypt_lib(void)
     return SUCCESS;
 }
 
+typedef enum {
+    PRIVATE_KEY = 0,
+    PUBLIC_KEY,
+    NO_KEY
+} key_type;
+
+static void create_key_path(char path[], key_type key)
+{
+    strcpy(path, getenv("HOME"));
+    switch (key) {
+        case PRIVATE_KEY:
+            strcat(path, "/"SPG_DIR_NAME"/.spg_priv.key");
+            break;
+        case PUBLIC_KEY:
+            strcat(path, "/"SPG_DIR_NAME"/spg_pub.key");
+            break;
+        case NO_KEY:
+            strcat(path, "/"SPG_DIR_NAME"/");
+            break;
+        default:
+            ERROR_LOG("wrong key type\n");
+            strcpy(path, "");
+    }
+    return;
+}
+
+static status check_home_dir(void)
+{
+    char buff[256];
+    DIR *d = NULL;
+    create_key_path(buff, NO_KEY);
+    d = opendir(buff);
+    if(!d)
+        return FAIL;
+    closedir(d);
+    return SUCCESS;
+}
+
+static status create_home_dir(void)
+{
+    status stat = SUCCESS;
+    char buff[256];
+    create_key_path(buff, NO_KEY);
+    if(mkdir(buff, S_IRWXU))
+    {
+        stat = FAIL;
+    }
+    return stat;
+}
+
 int main(int argc, char** argv)
 {
     status stat = SUCCESS;
     int next_option = 0;
     const char* const default_curve = "secp160r2";
-    const char* const default_priv_key = "spg_priv.key";
-    const char* const default_pub_key = "spg_pub.key";
-    const char* const default_signature = "spg.sign";
+    char default_priv_key[256] = {0};
+    char default_pub_key[256] = {0};
 
     operation opr = op_noop;
     operation_params_t params;
     memset( &params, '\0', sizeof(params));
     params.cipher = SYM_CIPHER_BLOWFISH;
 
+    /* validate environment */
+    if(230 < strlen(getenv("HOME")))
+    {
+            ERROR_LOG("HOME env var too long\n");
+            return FAIL;
+    }
+    /* chack if spg home dir exists */
+    if(check_home_dir())
+    {
+        INFO_LOG("SGP home directory doesn't exist. Create one.\n");
+        if(SUCCESS != create_home_dir())
+        {
+            ERROR_LOG("Can not create spg home dir: %s\n", strerror(errno));
+            return FAIL;
+        }
+    }
+    /* build paths to default keys */
+    create_key_path(default_priv_key, PRIVATE_KEY);
+    create_key_path(default_pub_key, PUBLIC_KEY);
+
+    /* initialize gcrypt lib */
     if(SUCCESS != init_gcrypt_lib())
     {
         ERROR_LOG("gcrypt library initialization failed\n");
@@ -279,6 +352,21 @@ int main(int argc, char** argv)
     /*
      * Validate params
      */
+    if( NULL != params.input &&
+            strlen(params.input) > MAX_FILE_NAME_SIZE-MAX_SUFFIX_SIZE )
+    {
+        ERROR_LOG("Input file name too long %d %s\n",
+                 (int)strlen(params.input), params.input );
+        return FAIL;
+    }
+    if( NULL != params.output &&
+       strlen(params.output) > MAX_FILE_NAME_SIZE-MAX_SUFFIX_SIZE )
+    {
+        ERROR_LOG("Output file name too long %d %s\n",
+                 (int)strlen(params.output), params.output );
+        return FAIL;
+    }
+
     if (!params.curve_name)
         params.curve_name = (char*) default_curve;
     switch ( opr )
@@ -317,12 +405,6 @@ int main(int argc, char** argv)
                 INFO_LOG("Looking for the private key in the "
                          "default location: %s\n", default_priv_key );
                 params.key_file = (char*)default_priv_key;
-            }
-            if ( NULL == params.output )
-            {
-                INFO_LOG("Signature file will be stored under the "
-                         "default file name: %s\n", default_priv_key );
-                params.output = (char*)default_signature;
             }
         }
         else

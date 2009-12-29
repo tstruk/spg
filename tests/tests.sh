@@ -3,42 +3,44 @@
 set PROG = spg
 set KEYS = "secp112r1 secp128r1 secp160r1 secp160r2 secp192r1 secp224r1 secp256r1 secp384r1 secp521r1"
 
+rm -f keys/*
+
 echo "RUNNING TESTS"
 ########################
 # Test generating key
 ########################
-#foreach KEY ( $KEYS )
-#echo "######### ${KEY} #################"
-#	./${PROG} -t -g -c ${KEY} -okeys/${KEY}.pem
-#	ls -l keys/${KEY}.pem
-#
-#	if( $? == 0 ) then
-#		echo ${KEY} generated ok
-#	else
-#		echo Gen key ${KEY} failed
-#		echo "!!!!!!!!!!!!!! FAILED !!!!!!!!!!!!!!!"
-#		exit
-#	endif
-#end
+foreach KEY ( $KEYS )
+echo "######### ${KEY} #################"
+	./${PROG} -t -g -c ${KEY} -okeys/${KEY}.pem
+	ls -l keys/${KEY}.pem
+
+	if( $? == 0 ) then
+		echo ${KEY} generated ok
+	else
+		echo Gen key ${KEY} failed
+		echo "!!!!!!!!!!!!!! FAILED !!!!!!!!!!!!!!!"
+		exit
+	endif
+end
 
 ########################
 # Test exporting key
 ########################
-#echo "##################################"
-#echo "Exporting public Keys"
-#echo "##################################"
+echo "##################################"
+echo "Exporting public Keys"
+echo "##################################"
 
-#foreach KEY ( $KEYS )
-#echo "######### ${KEY} #################"
-#	./${PROG} -t -x -kkeys/${KEY}.pem -okeys/public_${KEY}.pem
-#	if( $? == 0 ) then
-#		echo ${KEY} key exported ok
-#	else
-#		echo Key export ${KEY} failed
-#		echo "!!!!!!!!!!!!!! FAILED !!!!!!!!!!!!!!!"
-#		exit
-#	endif
-#end
+foreach KEY ( $KEYS )
+echo "######### ${KEY} #################"
+	./${PROG} -t -x -kkeys/${KEY}.pem -okeys/public_${KEY}.pem
+	if( $? == 0 ) then
+		echo ${KEY} key exported ok
+	else
+		echo Key export ${KEY} failed
+		echo "!!!!!!!!!!!!!! FAILED !!!!!!!!!!!!!!!"
+		exit
+	endif
+end
 
 ########################
 # Test singing message

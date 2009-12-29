@@ -93,8 +93,11 @@ do {                  \
 #define MAX_MSG_SIZE 0x40000 /*256K Bytes*/
 #define MAX_MSG_SIZE_STR "256K Bytes"
 #define MAX_BIG_NUM_SIZE 134 /* Max size of the big number in bytes. For curve secp521r1 it is 133 */
-#define MAX_FILE_NAME_SIZE 256
-#define SYM_CIPHER_DATA_UNIT_SIZE 1024
+#define MAX_FILE_NAME_SIZE 1024
+#define MAX_SUFFIX_SIZE 5
+#define SYM_CIPHER_DATA_UNIT_SIZE 4096
 #define ENCRYPTED_FILE_SUFFIX ".enc"
+#define SIGNATURE_FILE_SUFFIX ".sign"
+#define SPG_DIR_NAME ".spg"
 
 #endif /* _SPG_DEFS_H_ */

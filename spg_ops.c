@@ -170,11 +170,11 @@ static status read_private_key(EC_private_key_t* private_key, char* in_file)
             LOG("Read %d bytes from file %s\n", (int)len, in_file);
             if ((strncmp( PEM_PRV_KEY_NAME, name, strlen(PEM_PRV_KEY_NAME))) == 0)
             {
-                LOG("The file is an ECC private key in PEM format\n");
+                LOG("The file is an SPG private key in PEM format\n");
             }
             else
             {
-                ERROR_LOG("The file %s in not an ECC private key in PEM format\n", in_file);
+                ERROR_LOG("The file %s in not an SPG private key in PEM format\n", in_file);
                 FREE( data );
                 FREE( name );
                 FREE( header );
@@ -369,11 +369,11 @@ static status read_public_key ( EC_public_key_t* public_key, char* in_file )
             LOG("Read %d bytes from file %s\n", (int)len, in_file);
             if ((strncmp( PEM_PUB_KEY_NAME, name, strlen(PEM_PUB_KEY_NAME))) == 0)
             {
-                LOG("The file is an ECC public key in PEM format\n");
+                LOG("The file is an SPG public key in PEM format\n");
             }
             else
             {
-                ERROR_LOG("The file %s is not a ECC public key in PEM format\n", in_file);
+                ERROR_LOG("The file %s is not a SPG public key in PEM format\n", in_file);
                 FREE( data );
                 FREE( name );
                 FREE( header );
@@ -621,7 +621,7 @@ static status read_signature( EC_signature_t *sign, char* sign_file )
 /*
  *
  */
-status generate_signature( char* input, char* output, char* message )
+status generate_signature( char* key, char* output, char* message )
 {
     status stat = SUCCESS;
     EC_private_key_t priv_key;
@@ -629,18 +629,18 @@ status generate_signature( char* input, char* output, char* message )
     void* msg_buffer = NULL;
     long msg_size = 0;
     int dummy;
+    char signature_file_name[MAX_FILE_NAME_SIZE];
+    FILE *msg = NULL, *sign_file = NULL;
 
-    CHECK_PARAM( input );
-    CHECK_PARAM( output );
+    CHECK_PARAM( key );
     CHECK_PARAM( message );
-
-    FILE *msg = fopen(message, "r");
+    msg = fopen(message, "r");
     if (!msg)
     {
         ERROR_LOG("Can not open message file %s\n", message);
         return FAIL;
-
     }
+
     fseek(msg, 0, SEEK_END);
     msg_size = ftell( msg );
 
@@ -650,6 +650,24 @@ status generate_signature( char* input, char* output, char* message )
         fclose(msg);
         return FAIL;
     }
+
+    if(NULL == output)
+    {
+        strcpy( signature_file_name, message );
+        strcat( signature_file_name, SIGNATURE_FILE_SUFFIX );
+    }
+    else
+    {
+        strcpy( signature_file_name, output );
+    }
+    sign_file = fopen(signature_file_name, "w");
+    if (!sign_file)
+    {
+        ERROR_LOG("Can not create signature file %s\n", signature_file_name);
+        fclose(msg);
+        return FAIL;
+    }
+    fclose(sign_file);
 
     fseek(msg, 0, SEEK_SET);
 
@@ -662,7 +680,7 @@ status generate_signature( char* input, char* output, char* message )
     }
     dummy = fread( msg_buffer, 1, (size_t) msg_size, msg );
 
-    if ( ( stat = read_private_key(&priv_key, input) ) != SUCCESS )
+    if ( ( stat = read_private_key(&priv_key, key) ) != SUCCESS )
     {
         return stat;
     }
@@ -677,7 +695,7 @@ status generate_signature( char* input, char* output, char* message )
     free( msg_buffer );
 
     if ( stat == SUCCESS )
-        stat = write_signature(&sign, output );
+        stat = write_signature(&sign, signature_file_name );
 
     ec_release_signature( &sign );
     return stat;
@@ -686,7 +704,7 @@ status generate_signature( char* input, char* output, char* message )
 /*
  *
  */
-status verify_signature( char* input, char* output, char* message )
+status verify_signature( char* pub_key_name, char* output, char* message )
 {
     status stat = SUCCESS;
     EC_public_key_t pub_key;
@@ -695,7 +713,7 @@ status verify_signature( char* input, char* output, char* message )
     long msg_size = 0;
     int dummy;
 
-    CHECK_PARAM( input );
+    CHECK_PARAM( pub_key_name );
     CHECK_PARAM( output );
     CHECK_PARAM( message );
 
@@ -708,7 +726,7 @@ status verify_signature( char* input, char* output, char* message )
 
     fseek(msg, 0, SEEK_END);
     msg_size = ftell( msg );
-    
+
     if ( MAX_MSG_SIZE < msg_size )
     {
         ERROR_LOG("Max message size is " MAX_MSG_SIZE_STR "\n");
@@ -728,7 +746,7 @@ status verify_signature( char* input, char* output, char* message )
 
     dummy = fread( msg_buffer, 1, (size_t) msg_size, msg );
 
-    if ( ( stat = read_public_key(&pub_key, input) ) != SUCCESS )
+    if ( ( stat = read_public_key(&pub_key, pub_key_name) ) != SUCCESS )
     {
         ERROR_LOG("Failed to read public key file\n");
     }
@@ -1089,7 +1107,6 @@ status decrypt( char* key_file, char* file_to_decrypt, char* output )
             {
                 ERROR_LOG("Read data failed R.y");
                 stat = FAIL;
-            
             }
 #ifdef JACOBIAN_COORDINATES
             else
@@ -1097,7 +1114,7 @@ status decrypt( char* key_file, char* file_to_decrypt, char* output )
                 enc_key.R.z = mpi_new(0);
                 mpi_set_ui( enc_key.R.z, 1);
             }
-#endif            
+#endif
         }
     }
     if ( SUCCESS == stat )

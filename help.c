@@ -136,7 +136,7 @@ void print_help ( void )
     printf("Options are: \n"
            "   -c --curve            Specifies elliptic curve to use\n"
            "   -i --input            Specifies input file\n"
-           "   -k --input            Specifies key input file\n"
+           "   -k --key              Specifies key input file\n"
            "   -o --output           Specifies output file\n"
            "   -V --verbose          Turn on the verbose mode\n"
            "   -t --timing           Print time spent computing ecc algorithms\n"
