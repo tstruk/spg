@@ -35,7 +35,6 @@
 /*
  * File private variables
  */
-
 typedef enum
 {
     op_noop = 0,
@@ -262,7 +261,7 @@ int main(int argc, char** argv)
     /*
      * Possible user params are
      */
-    const char* const short_options = "gxsvedlphc:i:k:o:Vt";
+    const char* const short_options = "gxsvedlphc:i:k:o:V";
     const struct option long_options [] =
     {
         /* Operations */
