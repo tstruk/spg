@@ -21,14 +21,13 @@
 #define _SPG_DEFS_H_
 
 #define VERSION_MAJOR "0"
-#define VERSION_MINOR "4"
-#define VERSION_REV   "8"
+#define VERSION_MINOR "5"
+#define VERSION_REV   "1"
 
 #define VERSION_STRING VERSION_MAJOR "." VERSION_MINOR "." VERSION_REV
 
 extern const char* program_name;
 extern int verbose;
-extern int timing;
 
 typedef enum
 {

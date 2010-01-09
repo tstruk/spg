@@ -20,36 +20,20 @@
 #ifndef ECC_UTILS_H
 #define ECC_UTILS_H
 
-typedef struct time_stamp_s
-{
-    struct timespec time_v;
-    unsigned long long cycles;
-} time_stamp_t;
-
 /*
- *
+ * Function shows a progress while waiting for /dev/random
  */
 void inform_gather_random_data(void);
 
 /*
- *
+ * Function informs user when done reading /dev/random
  */
 void inform_gather_random_data_done(void);
 
 /*
- *
+ * Debuging function - prints big number
  */
 void print_big_number( big_number num );
 
-/*
- *
- */
-void get_time_stamp( time_stamp_t* time );
-
-/*
- *
- */
-void print_time(const time_stamp_t *before,
-                const time_stamp_t *after);
 
 #endif

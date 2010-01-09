@@ -281,7 +281,6 @@ int main(int argc, char** argv)
         { "input", 1, NULL, 'i' },       /* Input file */
         { "key", 1, NULL, 'k' },         /* Private/Public Key file */
         { "output", 1, NULL, 'o' },      /* Output file */
-        { "timing", 0, NULL, 't' },      /* Print timing */
         { NULL, 0, NULL, 0 }             /* NULL terminator*/
     };
 
@@ -335,9 +334,6 @@ int main(int argc, char** argv)
             break;
         case 'V':
             verbose = 1;
-            break;
-        case 't':
-            timing = 1;
             break;
         case -1:
             break;

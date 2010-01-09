@@ -20,19 +20,11 @@
 #include <gcrypt.h>
 #include <assert.h>
 #include <stdio.h>
-#include <sys/time.h>
-#include <time.h>
 #include "defs.h"
 #include "ec_point.h"
 #include "ecc.h"
 #include "curves.h"
 #include "utils.h"
-
-/*
- * Structures used for time measurment
- */
-static time_stamp_t ecc_time_before_op;
-static time_stamp_t ecc_time_after_op;
 
 /*
  *
@@ -59,7 +51,6 @@ status ec_generate_key(EC_private_key_t* priv_key, const char *curve_name)
     inform_gather_random_data();
     gcry_mpi_randomize ( priv_key->priv, mpi_get_nbits(c.params.n), GCRY_VERY_STRONG_RANDOM);
     inform_gather_random_data_done();
-    get_time_stamp(&ecc_time_before_op);
     /*
      * Make sure d < n
      */
@@ -69,8 +60,6 @@ status ec_generate_key(EC_private_key_t* priv_key, const char *curve_name)
      */
     priv_key->pub.c = c;
     priv_key->pub.Q = ec_point_multiply( &c.params.G, priv_key->priv, &c.params );
-    get_time_stamp(&ecc_time_after_op);
-    print_time( &ecc_time_before_op, &ecc_time_after_op);
     return stat;
 }
 
@@ -144,7 +133,6 @@ status ec_generate_signature( EC_private_key_t* priv_key, EC_signature_t* sign, 
             k = mpi_new(0);
             gcry_mpi_randomize ( k, mpi_get_nbits(priv_key->pub.c.params.n),
                                  GCRY_STRONG_RANDOM);
-            get_time_stamp(&ecc_time_before_op);
             /*
              * Make sure k < n
              */
@@ -187,7 +175,6 @@ status ec_generate_signature( EC_private_key_t* priv_key, EC_signature_t* sign, 
         mpi_addm(sign->s, sign->s, e, priv_key->pub.c.params.n);
         mpi_invm(e, k, priv_key->pub.c.params.n);
         mpi_mulm(sign->s, sign->s, e, priv_key->pub.c.params.n);
-        get_time_stamp(&ecc_time_after_op);
         /*
          * if s != 0 then pair of unmbers
          * s and r are the valid signature
@@ -201,7 +188,6 @@ status ec_generate_signature( EC_private_key_t* priv_key, EC_signature_t* sign, 
     }
     while (!gen_s_ok);
 
-    print_time( &ecc_time_before_op, &ecc_time_after_op);
     mpi_release(k);
     mpi_release(e);
     gcry_md_close(hash);
@@ -226,7 +212,6 @@ status ec_verify_signature( EC_public_key_t* public_key, EC_signature_t* sign, v
     CHECK_PARAM( sign );
     CHECK_PARAM( data );
 
-    get_time_stamp(&ecc_time_before_op);
     /*
      * Check point 1:
      * 1. Verify that r and s are integers in [1,n - 1]. If not, the signature is invalid.
@@ -289,8 +274,6 @@ status ec_verify_signature( EC_public_key_t* public_key, EC_signature_t* sign, v
         u2QA = ec_point_multiply( &public_key->Q, u2, &public_key->c.params  );
         ec_point_add_affine(&u1G, &u1G, &u2QA, &public_key->c.params );
 
-        get_time_stamp(&ecc_time_after_op);
-
         if ( mpi_cmp( sign->r, u1G.x ) == 0 )
         {
             LOG("Signature is valid\n");
@@ -300,7 +283,6 @@ status ec_verify_signature( EC_public_key_t* public_key, EC_signature_t* sign, v
             ERROR_LOG("Signature is NOT valid\n");
             stat = SIGNATURE_INVALID;
         }
-        print_time( &ecc_time_before_op, &ecc_time_after_op);
         gcry_md_close(hash);
         mpi_release( w );
         mpi_release( e );
@@ -406,7 +388,6 @@ status ec_generate_enc_key( EC_enc_key_t* enc_key, EC_public_key_t* public_key )
 
     CHECK_PARAM( enc_key );
     CHECK_PARAM( public_key );
-    get_time_stamp(&ecc_time_before_op);
 
     do
     {
@@ -450,8 +431,6 @@ status ec_generate_enc_key( EC_enc_key_t* enc_key, EC_public_key_t* public_key )
      * Derive symmetric keys for cipher and HMAC
      */
     stat = ec_sym_key_derive( enc_key, Z.x );
-    get_time_stamp(&ecc_time_after_op);
-    print_time( &ecc_time_before_op, &ecc_time_after_op);
 
     mpi_release( k );
     mpi_release( h );
@@ -473,7 +452,6 @@ status ec_generate_dec_key( EC_enc_key_t* enc_key, EC_private_key_t* priv_key )
     CHECK_PARAM( priv_key );
 
     hd = mpi_new(0);
-    get_time_stamp(&ecc_time_before_op);
 
     mpi_mul_ui(hd, priv_key->priv, priv_key->pub.c.params.h );
     Z = ec_point_multiply( &enc_key->R , hd, &priv_key->pub.c.params );
@@ -486,8 +464,6 @@ status ec_generate_dec_key( EC_enc_key_t* enc_key, EC_private_key_t* priv_key )
     }
 
     stat = ec_sym_key_derive( enc_key, Z.x );
-    get_time_stamp(&ecc_time_after_op);
-    print_time( &ecc_time_before_op, &ecc_time_after_op);
     mpi_release( hd );
     ec_point_free( &Z );
     return stat;

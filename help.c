@@ -139,7 +139,6 @@ void print_help ( void )
            "   -k --key              Specifies key input file\n"
            "   -o --output           Specifies output file\n"
            "   -V --verbose          Turn on the verbose mode\n"
-           "   -t --timing           Print time spent computing ecc algorithms\n"
           );
     printf("\nFor more help on commands use: \n%s --help <command> \n", program_name );
     printf("\nE.g. \n%s --help sign\n\n", program_name );

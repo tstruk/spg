@@ -33,26 +33,9 @@
  */
 const char* program_name = "spg";
 int verbose = 0;
-int timing = 0;
 
 /*
- * Function reads and returns time stamp register on x86 architecutres
- * On other architectures returns zero.
- */
-static inline unsigned long long rdtsc(void)
-{
-    /* Works only for x86 */
-#if defined(__i386__) || defined(__x86_64__)
-    unsigned int a, d;
-__asm__ volatile("rdtsc" : "=a" (a), "=d" (d));
-    return ((unsigned long long)a) | (((unsigned long long)d) << 32);;
-#else
-    return 0;
-#endif
-}
-
-/*
- *
+ * Debuging function - prints big number
  */
 void print_big_number( big_number num )
 {
@@ -81,7 +64,7 @@ static void* inform ( void* param)
 }
 
 /*
- *
+ * Function shows a progress while waiting for /dev/random
  */
 void inform_gather_random_data()
 {
@@ -95,60 +78,10 @@ void inform_gather_random_data()
 }
 
 /*
- *
+ * Function informs user when done reading /dev/random
  */
 void inform_gather_random_data_done()
 {
     done = 1;
     printf("\ndone\n");
 }
-
-/*
- *
- */
-void get_time_stamp( time_stamp_t* time )
-{
-    if ( timing )
-    {
-        memset(time, '\0', sizeof(time_stamp_t));
-        time->cycles = rdtsc();
-        clock_gettime(CLOCK_REALTIME, &time->time_v );
-    }
-}
-
-/*
- *
- */
-void print_time(const time_stamp_t *before, const time_stamp_t *after)
-{
-    if ( timing )
-    {
-        if ( after->time_v.tv_sec == before->time_v.tv_sec )
-        {
-            printf("Operation time: 0.%06d sec in %llu  CPU cycles\n",
-                   (unsigned int)((after->time_v.tv_nsec - before->time_v.tv_nsec) / 1000 ),
-                   after->cycles - before->cycles
-                  );
-        }
-        else
-        {
-            if ( before->time_v.tv_nsec < after->time_v.tv_nsec  )
-            {
-                printf("Operation time: %d.%06d sec in %llu CPU cycles.\n",
-                       (unsigned int)(after->time_v.tv_sec - before->time_v.tv_sec),
-                       (unsigned int)(after->time_v.tv_nsec - before->time_v.tv_nsec) / 1000 ,
-                       after->cycles - before->cycles
-                      );
-            }
-            else
-            {
-                printf("Operation time: %d.%06d sec in %llu CPU cycles.\n",
-                       (unsigned int)(after->time_v.tv_sec - before->time_v.tv_sec) - 1,
-                       (unsigned int)(1000000000 - (before->time_v.tv_nsec - after->time_v.tv_nsec)) / 1000 ,
-                       after->cycles - before->cycles
-                      );
-            }
-        }
-    }
-}
-
