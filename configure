@@ -10300,10 +10300,6 @@ CC="$lt_save_CC"
 
 
 
-#PKG_CHECK_MODULES(LIBSSL, [LIBSSL >= 0.9])
-#AC_SUBST(LIBSSL_CFLAGS)
-#AC_SUBST(LIBSSL_LIBS)
-
 
 
 if test "x$ac_cv_env_PKG_CONFIG_set" != "xset"; then
@@ -10555,12 +10551,13 @@ _ACEOF
 
   LIBS="-lgcrypt $LIBS"
 
+else
+
+        echo "Error! gcrypt library not found."
+        exit -1
+
 fi
 
-
-#PKG_CHECK_MODULES(LIBSSL, [LIBSSL >= 0.9])
-#AC_SUBST(LIBSSL_CFLAGS)
-#AC_SUBST(LIBSSL_LIBS)
 
 ac_config_files="$ac_config_files Makefile"
 

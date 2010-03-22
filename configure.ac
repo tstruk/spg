@@ -6,18 +6,13 @@ AC_LANG_C
 AC_PROG_CC
 AM_PROG_LIBTOOL
 
-#PKG_CHECK_MODULES(LIBSSL, [LIBSSL >= 0.9])
-#AC_SUBST(LIBSSL_CFLAGS)
-#AC_SUBST(LIBSSL_LIBS)
-
 PKG_CHECK_MODULES(libcrypto, [libcrypto >= 0.9])
 AC_SUBST(libcrypto_CFLAGS)
 AC_SUBST(libcrypto_LIBS)
-AC_CHECK_LIB(gcrypt, gcry_mpi_new)
-
-#PKG_CHECK_MODULES(LIBSSL, [LIBSSL >= 0.9])
-#AC_SUBST(LIBSSL_CFLAGS)
-#AC_SUBST(LIBSSL_LIBS)
+AC_CHECK_LIB(gcrypt, gcry_mpi_new, [], [
+        echo "Error! gcrypt library not found."
+        exit -1
+        ])
 
 AC_CONFIG_FILES(Makefile)
 AC_OUTPUT

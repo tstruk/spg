@@ -222,10 +222,10 @@ static status read_private_key(EC_private_key_t* private_key, char* in_file)
                     stat = FAIL;
                 }
             }
-#ifdef JACOBIAN_COORDINATES 
+#ifdef JACOBIAN_COORDINATES
             private_key->pub.Q.z = mpi_new(0);
             mpi_set_ui(private_key->pub.Q.z, 1);
-#endif            
+#endif
             if ( SUCCESS == stat )
             {
                 /*
@@ -421,13 +421,13 @@ static status read_public_key ( EC_public_key_t* public_key, char* in_file )
                     stat = FAIL;
                 }
             }
-#ifdef JACOBIAN_COORDINATES 
+#ifdef JACOBIAN_COORDINATES
             public_key->Q.z = mpi_new(0);
             mpi_set_ui(public_key->Q.z, 1);
-#endif             
+#endif
             if ( SUCCESS == stat )
             {
-                char curve_name[1024];
+                char curve_name[BUFFER_SIZE];
                 curve c;
                 /*
                  * Scan curve data
@@ -780,7 +780,7 @@ status encrypt( char* key_file, char* file_to_encrypt )
     char plain_txt_buff[SYM_CIPHER_DATA_UNIT_SIZE];
     char cipher_txt_buff[SYM_CIPHER_DATA_UNIT_SIZE];
 
-    FILE* f_to_enc = fopen( file_to_encrypt, "rb" );
+    FILE* f_to_enc = NULL;
     FILE* f_enc = NULL;
 
     unsigned char hmac_buff[SHA1_LEN];
@@ -789,6 +789,8 @@ status encrypt( char* key_file, char* file_to_encrypt )
 
     CHECK_PARAM( key_file );
     CHECK_PARAM( file_to_encrypt );
+
+    f_to_enc = fopen( file_to_encrypt, "rb" );
 
     if (!f_to_enc)
     {
@@ -980,7 +982,7 @@ status decrypt( char* key_file, char* file_to_decrypt, char* output )
     EC_private_key_t priv_key;
     char dec_file_name[MAX_FILE_NAME_SIZE];
 
-    FILE* f_to_dec = fopen( file_to_decrypt, "rb" );
+    FILE* f_to_dec = NULL;
     FILE* f_dec = NULL;
 
     unsigned char hmac_buff[SHA1_LEN];
@@ -996,6 +998,8 @@ status decrypt( char* key_file, char* file_to_decrypt, char* output )
      */
     CHECK_PARAM( key_file );
     CHECK_PARAM( file_to_decrypt );
+
+    f_to_dec = fopen( file_to_decrypt, "rb" );
 
     if (!f_to_dec)
     {
