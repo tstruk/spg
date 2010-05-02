@@ -219,6 +219,22 @@ static status create_home_dir(void)
     return stat;
 }
 
+static status check_file_exists( const char* file)
+{
+    FILE *f = fopen(file, "r");
+    char q = 0;
+    if(f)
+    {
+        fclose(f);
+        INFO_LOG("The file %s alread exists. Do you want to overwrite it? [y/n] ",
+                    file);
+        q = getc(stdin);
+        if(q != 'y')
+            return FAIL;
+    }
+    return SUCCESS;
+}
+
 int main(int argc, char** argv)
 {
     status stat = SUCCESS;
@@ -374,6 +390,10 @@ int main(int argc, char** argv)
                      "private key: %s\n", default_priv_key );
             params.output = (char*)default_priv_key;
         }
+        /* Check if the key is already there */
+        if( check_file_exists(params.output) )
+            return FAIL;
+
         break;
     case op_exp_pub_key:
 
@@ -389,6 +409,10 @@ int main(int argc, char** argv)
                      "public key: %s\n", default_pub_key );
             params.output = (char*)default_pub_key;
         }
+        /* Check if the key is already there */
+        if( check_file_exists(params.output) )
+            return FAIL;
+
         break;
     case op_gen_sign:
 
