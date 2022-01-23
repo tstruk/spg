@@ -1,7 +1,6 @@
 /*************************************************************************
  * Small Privacy Guard
- * Copyright (C) Tadeusz Struk 2009 <tstruk@gmail.com>
- * $Id$
+ * Copyright (C) Tadeusz Struk 2009-2022 <tstruk@gmail.com>
  *
  * This is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -376,41 +375,41 @@ static curve_t curves_tab[] =
 };
 
 
-static inline unsigned int curves_number( void )
+static inline unsigned int curves_number(void)
 {
     return (sizeof(curves_tab) / sizeof(curve_t)) - 1;
 }
 
-status populate_curve( curve* c ,curve_t* c_tab)
+status populate_curve(curve* c ,curve_t* c_tab)
 {
     status stat = SUCCESS;
-    c->name = malloc(strlen( c_tab->name ) + 1);
-    memcpy ( c->name, c_tab->name, strlen( c_tab->name ) );
-    c->name[strlen( c_tab->name )] = '\0';
-    c->oid = malloc(strlen( c_tab->oid ) + 1);
-    memcpy ( c->oid, c_tab->oid, strlen( c_tab->oid ) );
-    c->oid[strlen( c_tab->oid )] = '\0';
-    if ( GPG_ERR_NO_ERROR != gcry_mpi_scan( &c->params.p , GCRYMPI_FMT_HEX, c_tab->p, 0, NULL) )
+    c->name = malloc(strlen(c_tab->name) + 1);
+    memcpy (c->name, c_tab->name, strlen(c_tab->name));
+    c->name[strlen(c_tab->name)] = '\0';
+    c->oid = malloc(strlen(c_tab->oid) + 1);
+    memcpy (c->oid, c_tab->oid, strlen(c_tab->oid));
+    c->oid[strlen(c_tab->oid)] = '\0';
+    if (GPG_ERR_NO_ERROR != gcry_mpi_scan(&c->params.p , GCRYMPI_FMT_HEX, c_tab->p, 0, NULL))
     {
         return FAIL;
     }
-    if ( GPG_ERR_NO_ERROR != gcry_mpi_scan( &c->params.a , GCRYMPI_FMT_HEX, c_tab->a, 0, NULL))
+    if (GPG_ERR_NO_ERROR != gcry_mpi_scan(&c->params.a , GCRYMPI_FMT_HEX, c_tab->a, 0, NULL))
     {
         return FAIL;
     }
-    if ( GPG_ERR_NO_ERROR != gcry_mpi_scan( &c->params.b , GCRYMPI_FMT_HEX, c_tab->b, 0, NULL))
+    if (GPG_ERR_NO_ERROR != gcry_mpi_scan(&c->params.b , GCRYMPI_FMT_HEX, c_tab->b, 0, NULL))
     {
         return FAIL;
     }
-    if ( GPG_ERR_NO_ERROR != gcry_mpi_scan( &c->params.G.x , GCRYMPI_FMT_HEX, c_tab->G.x, 0, NULL))
+    if (GPG_ERR_NO_ERROR != gcry_mpi_scan(&c->params.G.x , GCRYMPI_FMT_HEX, c_tab->G.x, 0, NULL))
     {
         return FAIL;
     }
-    if ( GPG_ERR_NO_ERROR != gcry_mpi_scan( &c->params.G.y , GCRYMPI_FMT_HEX, c_tab->G.y, 0, NULL))
+    if (GPG_ERR_NO_ERROR != gcry_mpi_scan(&c->params.G.y , GCRYMPI_FMT_HEX, c_tab->G.y, 0, NULL))
     {
         return FAIL;
     }
-    if ( GPG_ERR_NO_ERROR != gcry_mpi_scan( &c->params.n , GCRYMPI_FMT_HEX, c_tab->n, 0, NULL))
+    if (GPG_ERR_NO_ERROR != gcry_mpi_scan(&c->params.n , GCRYMPI_FMT_HEX, c_tab->n, 0, NULL))
     {
         return FAIL;
     }
@@ -426,25 +425,25 @@ void free_curve(curve *c)
 {
     FREE(c->name);
     FREE(c->oid);
-    mpi_release( c->params.p);
-    mpi_release( c->params.a );
-    mpi_release( c->params.b );
-    mpi_release( c->params.G.x );
-    mpi_release( c->params.G.y );
+    mpi_release(c->params.p);
+    mpi_release(c->params.a);
+    mpi_release(c->params.b);
+    mpi_release(c->params.G.x);
+    mpi_release(c->params.G.y);
 #ifdef JACOBIAN_COORDINATES
-    mpi_release( c->params.G.z );
+    mpi_release(c->params.G.z);
 #endif
-    mpi_release( c->params.n );
+    mpi_release(c->params.n);
     c->params.h = 0;
     return;
 }
 
-void init_curve( curve* c)
+void init_curve(curve* c)
 {
     memset(c, '\0', sizeof(curve));
 }
 
-status get_curve_by_name( curve* c, const char* name )
+status get_curve_by_name(curve* c, const char* name)
 {
     int i = 0;
     status stat = FAIL;
@@ -452,13 +451,13 @@ status get_curve_by_name( curve* c, const char* name )
 
     assert(c != NULL);
     init_curve(c);
-    for (i = 0; i < curves_number(); i++ )
+    for (i = 0; i < curves_number(); i++)
     {
         c_tab = &curves_tab[i];
 
-        if ( strncmp( name, c_tab->name, strlen(c_tab->name) ) == 0 )
+        if (strncmp(name, c_tab->name, strlen(c_tab->name)) == 0)
         {
-            if ( (stat = populate_curve( c, c_tab) ) == FAIL )
+            if ((stat = populate_curve(c, c_tab)) == FAIL)
             {
                 free_curve(c);
             }
@@ -468,7 +467,7 @@ status get_curve_by_name( curve* c, const char* name )
     return stat;
 }
 
-status get_curve_by_len( curve* c, const int len )
+status get_curve_by_len(curve* c, const int len)
 {
     int i = 0;
     status stat = FAIL;
@@ -476,13 +475,13 @@ status get_curve_by_len( curve* c, const int len )
 
     assert(c != NULL);
     init_curve(c);
-    for (i = 0; i < curves_number(); i++ )
+    for (i = 0; i < curves_number(); i++)
     {
         c_tab = &curves_tab[i];
 
-        if ( len > c_tab->security &&  c_tab->security < (c_tab+1)->security )
+        if (len > c_tab->security && c_tab->security < (c_tab + 1)->security)
         {
-            if ( (stat = populate_curve( c, c_tab) ) == FAIL )
+            if ((stat = populate_curve(c, c_tab)) == FAIL)
             {
                 free_curve(c);
             }
@@ -493,17 +492,17 @@ status get_curve_by_len( curve* c, const int len )
 }
 
 
-void list_curves( void )
+void list_curves(void)
 {
     int i = 0;
     curve_t* c_tab = NULL;
     printf("+--+-----------+---------+---------------------+\n");
     printf("|Nr|   Name    | Key len | OID                 |\n");
     printf("+--+-----------+---------+---------------------+\n");
-    for (i = 0; i < curves_number(); i++ )
+    for (i = 0; i < curves_number(); i++)
     {
         c_tab = &curves_tab[i];
-        printf("|%2d| %s | %3d     | %-19s | \n", i+1, c_tab->name, c_tab->security, c_tab->oid );
+        printf("|%2d| %s | %3d     | %-19s | \n", i+1, c_tab->name, c_tab->security, c_tab->oid);
     }
     printf("+--+-----------+---------+---------------------+\n");
 }

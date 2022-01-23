@@ -1,7 +1,6 @@
 /*************************************************************************
  * Small Privacy Guard
- * Copyright (C) Tadeusz Struk 2009 <tstruk@gmail.com>
- * $Id$
+ * Copyright (C) Tadeusz Struk 2009-2022 <tstruk@gmail.com>
  *
  * This is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -26,7 +25,7 @@ typedef struct EC_point_s
 {
     big_number x;
     big_number y;
-#ifdef JACOBIAN_COORDINATES    
+#ifdef JACOBIAN_COORDINATES
     big_number z;
 #endif
 } EC_point_t;

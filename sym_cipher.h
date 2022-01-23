@@ -1,7 +1,6 @@
 /*************************************************************************
  * Small Privacy Guard
- * Copyright (C) Tadeusz Struk 2009 <tstruk@gmail.com>
- * $Id$
+ * Copyright (C) Tadeusz Struk 2009-2022 <tstruk@gmail.com>
  *
  * This is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -25,6 +24,7 @@
  */
 typedef enum
 {
+
     SYM_CIPHER_BLOWFISH = 0,
     SYM_CIPHER_AES,
     SYM_CIPHER_TERM
@@ -36,10 +36,12 @@ extern const char* cipher_names[];
  */
 typedef struct sym_cipher_hdl_s
 {
+
     status (*encrypt) (struct sym_cipher_hdl_s*, void*, void*, size_t);
     status (*decrypt) (struct sym_cipher_hdl_s*, void*, void*, size_t);
     status (*uninit) (struct sym_cipher_hdl_s*);
     void* ctx; /* cipher private context */
+
 } sym_cipher_hdl_t;
 
 /*
@@ -47,19 +49,22 @@ typedef struct sym_cipher_hdl_s
  * Initialises symmetric cipher context. Curently only supported ciphers
  * are indicated by sym_cipher  enum
  */
-status sym_cipher_init(sym_cipher_hdl_t** cipher_hdl, sym_cipher cipher, void* key, size_t key_len);
+status sym_cipher_init(sym_cipher_hdl_t** cipher_hdl,
+	sym_cipher cipher, void* key, size_t key_len);
 
 /*
  * Function: sym_cipher_encrypt
  * Encrypt data using symmetric cipher
  */
-status sym_cipher_encrypt(sym_cipher_hdl_t* cipher_hdl, void* in, void* out, size_t len);
+status sym_cipher_encrypt(sym_cipher_hdl_t* cipher_hdl,
+	void* in, void* out, size_t len);
 
 /*
  * Function: sym_cipher_decrypt
  * Decrypt data using symmetric cipher
  */
-status sym_cipher_decrypt(sym_cipher_hdl_t* cipher_hdl, void* in, void* out, size_t len);
+status sym_cipher_decrypt(sym_cipher_hdl_t* cipher_hdl,
+	void* in, void* out, size_t len);
 
 /*
  * Function: sym_cipher_close

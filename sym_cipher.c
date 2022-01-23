@@ -1,7 +1,6 @@
 /*************************************************************************
  * Small Privacy Guard
- * Copyright (C) Tadeusz Struk 2009 <tstruk@gmail.com>
- * $Id$
+ * Copyright (C) Tadeusz Struk 2009-2022 <tstruk@gmail.com>
  *
  * This is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -53,10 +52,10 @@ typedef struct blowfish_ctx_s
  * Private encrypt rutine for
  * blowfish cipher
  */
-static status blowfish_encrypt(sym_cipher_hdl_t* cipher_hdl, void* in, void* out, size_t len )
+static status blowfish_encrypt(sym_cipher_hdl_t* cipher_hdl, void* in, void* out, size_t len)
 {
     blowfish_ctx_t *bf_ctx = (blowfish_ctx_t*)cipher_hdl->ctx;
-    BF_cfb64_encrypt( in, out, len, &bf_ctx->key, &bf_ctx->iv, &bf_ctx->num, BF_ENCRYPT);
+    BF_cfb64_encrypt(in, out, len, &bf_ctx->key, &bf_ctx->iv, &bf_ctx->num, BF_ENCRYPT);
     return SUCCESS;
 }
 
@@ -64,10 +63,10 @@ static status blowfish_encrypt(sym_cipher_hdl_t* cipher_hdl, void* in, void* out
  * Private decrypt rutine for
  * blowfish cipher
  */
-static status blowfish_decrypt(sym_cipher_hdl_t* cipher_hdl, void* in, void* out, size_t len )
+static status blowfish_decrypt(sym_cipher_hdl_t* cipher_hdl, void* in, void* out, size_t len)
 {
     blowfish_ctx_t *bf_ctx = (blowfish_ctx_t*)cipher_hdl->ctx;
-    BF_cfb64_encrypt( in, out, len, &bf_ctx->key, &bf_ctx->iv, &bf_ctx->num, BF_DECRYPT);
+    BF_cfb64_encrypt(in, out, len, &bf_ctx->key, &bf_ctx->iv, &bf_ctx->num, BF_DECRYPT);
     return SUCCESS;
 
 }
@@ -88,14 +87,14 @@ static status blowfish_uninit(sym_cipher_hdl_t* cipher_hdl)
 /*
  * sym_cipher_init
  */
-status sym_cipher_init( sym_cipher_hdl_t** cipher_hdl, sym_cipher cipher, void* key, size_t key_len )
+status sym_cipher_init(sym_cipher_hdl_t** cipher_hdl, sym_cipher cipher, void* key, size_t key_len)
 {
     status stat = SUCCESS;
-    CHECK_PARAM( cipher_hdl );
-    CHECK_PARAM( key );
+    CHECK_PARAM(cipher_hdl);
+    CHECK_PARAM(key);
     sym_cipher_hdl_t* c_ptr = NULL;
 
-    *cipher_hdl = malloc( sizeof( sym_cipher_hdl_t ) );
+    *cipher_hdl = malloc(sizeof(sym_cipher_hdl_t));
     if (!(*cipher_hdl))
     {
         ERROR_LOG("Memory allocation failed");
@@ -104,18 +103,18 @@ status sym_cipher_init( sym_cipher_hdl_t** cipher_hdl, sym_cipher cipher, void* 
 
     c_ptr = *cipher_hdl;
 
-    switch ( cipher )
+    switch (cipher)
     {
     case SYM_CIPHER_BLOWFISH:
     {
-        blowfish_ctx_t *bf_ctx = malloc( sizeof(blowfish_ctx_t) );
-        if ( !bf_ctx )
+        blowfish_ctx_t *bf_ctx = malloc(sizeof(blowfish_ctx_t));
+        if (!bf_ctx)
         {
             ERROR_LOG("Memory allocation failed");
             FREE(cipher_hdl);
             return FAIL;
         }
-        BF_set_key( &bf_ctx->key, key_len, key);
+        BF_set_key(&bf_ctx->key, key_len, key);
         bf_ctx->num = 0;
         bf_ctx->iv = 0;
         c_ptr->ctx = bf_ctx;
@@ -137,26 +136,26 @@ status sym_cipher_init( sym_cipher_hdl_t** cipher_hdl, sym_cipher cipher, void* 
 /*
  * sym_cipher_encrypt
  */
-inline status sym_cipher_encrypt( sym_cipher_hdl_t* cipher_hdl, void* in, void* out, size_t len )
+status sym_cipher_encrypt(sym_cipher_hdl_t* cipher_hdl, void* in, void* out, size_t len)
 {
-    return cipher_hdl->encrypt( cipher_hdl, in, out, len );
+    return cipher_hdl->encrypt(cipher_hdl, in, out, len);
 }
 
 /*
  * sym_cipher_decrypt
  */
-inline status sym_cipher_decrypt( sym_cipher_hdl_t* cipher_hdl, void* in, void* out, size_t len )
+status sym_cipher_decrypt(sym_cipher_hdl_t* cipher_hdl, void* in, void* out, size_t len)
 {
-    return cipher_hdl->decrypt( cipher_hdl, in, out, len );
+    return cipher_hdl->decrypt(cipher_hdl, in, out, len);
 }
 
 /*
  * sym_cipher_close
  */
-inline status sym_cipher_close( sym_cipher_hdl_t* cipher_hdl )
+status sym_cipher_close(sym_cipher_hdl_t* cipher_hdl)
 {
-    status stat = cipher_hdl->uninit( cipher_hdl );
-    FREE( cipher_hdl );
+    status stat = cipher_hdl->uninit(cipher_hdl);
+    FREE(cipher_hdl);
     return stat;
 }
 /*
@@ -166,9 +165,9 @@ void sym_cipher_list(void)
 {
     char** tab_ptr = (char**)cipher_names;
     int i = 0;
-    while ( NULL != *tab_ptr )
+    while (NULL != *tab_ptr)
     {
-        printf("%2d. %s\n", i, *tab_ptr++ );
+        printf("%2d. %s\n", i, *tab_ptr++);
         i++;
     }
     return;
