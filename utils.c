@@ -36,7 +36,7 @@ int verbose = 0;
 /*
  * Debuging function - prints big number
  */
-void print_big_number( big_number num )
+void print_big_number(big_number num)
 {
     size_t buff_size = 0;
     unsigned char buff[BUFF_SIZE];
@@ -50,10 +50,10 @@ static int done = 0;
 /*
  *
  */
-static void* inform ( void* param)
+static void* inform (void* param)
 {
     printf("working");
-    while (!(done))
+    while (!done)
     {
         printf(".");
         fflush( stdout );

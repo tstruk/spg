@@ -21,11 +21,11 @@
 /*
  * Prints general help
  */
-void print_help ( void );
+void print_help(void);
 
 /*
  * Prints help on given command
  */
-void print_operation_help( const char* const opr );
+void print_operation_help(const char* const opr);
 
 #endif /* _SPG_HELP_H_ */

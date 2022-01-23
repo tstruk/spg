@@ -33,81 +33,19 @@ typedef struct EC_point_s
 struct domain_GFp_params_s;
 typedef struct domain_GFp_params_s GFp_params_t;
 
-/*
- * Function:
- *
- */
 int ec_point_is_infinity_affine(const EC_point_t *p);
-
-/*
- * Function:
- *
- */
-void ec_point_init( EC_point_t *p );
-
-/*
- * Function:
- *
- */
-void ec_point_free( EC_point_t *p );
-
-/*
- * Function:
- *
- */
+void ec_point_init(EC_point_t *p);
+void ec_point_free(EC_point_t *p);
 void ec_point_zero(EC_point_t *p);
-
-/*
- * Function:
- *
- */
 void ec_point_copy(EC_point_t *p, const EC_point_t *q);
-
-/*
- * Function:
- *
- */
 int ec_point_on_curve(const EC_point_t *p, const GFp_params_t *params);
-
-/*
- * Function:
- *
- */
-status ec_point_add_affine( EC_point_t *r, const EC_point_t *q,
-                     const EC_point_t *p, const GFp_params_t *params );
-/*
- * Function:
- *
- */
-status ec_point_double_affine( EC_point_t *r, const EC_point_t *p,
-                        const GFp_params_t *params );
-
-/*
- * Function:
- *
- */
+status ec_point_add_affine(EC_point_t *r, const EC_point_t *q,
+		           const EC_point_t *p, const GFp_params_t *params);
+status ec_point_double_affine(EC_point_t *r, const EC_point_t *p,
+                              const GFp_params_t *params);
 EC_point_t ec_point_multiply(const EC_point_t *p, const big_number d,
-                             const GFp_params_t *params  );
-
-/*
- * Function:
- *
- */
-status ec_point_sub( EC_point_t *r, const EC_point_t *q,
-                     const EC_point_t *p, const GFp_params_t *params );
-
-/*
- * Function:
- *
- */
-void ec_debug_print_point(const EC_point_t const *p );
-
-#ifdef JACOBIAN_COORDINATES
-/*
- * Function:
- *
- */
-//void ec_point_jacobian_to_affine( EC_point_t *r, const EC_point_t *p,
-//                                  const GFp_params_t *params );
-#endif
+                             const GFp_params_t *params );
+status ec_point_sub(EC_point_t *r, const EC_point_t *q,
+                    const EC_point_t *p, const GFp_params_t *params);
+void ec_debug_print_point(const EC_point_t const *p);
 #endif

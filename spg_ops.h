@@ -22,37 +22,16 @@
  * Generates private key on curve curve_name
  * and writes the key to file out_file in PEM format
  */
-status generate_keys( char* curve_name, char* out_file );
+status generate_keys(char* curve_name, char* out_file);
 
 /*
  * Function: export_public_key
  * Exports public key from the private key stored in in_file
  * and writes it to out_file
  */
-status export_public_key (char* in_file, char* out_file );
-
-/*
- * Function: generate_signature
- *
- */
-status generate_signature( char* input, char* output, char* message );
-
-/*
- * Function: verify_signature
- *
- */
-status verify_signature( char* input, char* output, char* message );
-
-/*
- * Function: encrypt
- *
- */
-status encrypt( char* key_file, char* file_to_encrypt, sym_cipher cipher );
-
-/*
- * Function: decrypt
- *
- */
-status decrypt( char* key_file, char* file_to_decrypt, char* output, sym_cipher cipher );
-
+status export_public_key(char* in_file, char* out_file);
+status generate_signature(char* input, char* output, char* message);
+status verify_signature(char* input, char* output, char* message);
+status encrypt(char* key_file, char* file_to_encrypt, sym_cipher cipher);
+status decrypt(char* key_file, char* file_to_decrypt, char* output, sym_cipher cipher);
 #endif

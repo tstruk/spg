@@ -112,7 +112,7 @@ typedef struct EC_signature_s
 } EC_signature_t;
 
 /*
- * Encryption key structure 
+ * Encryption key structure
  */
 typedef struct EC_enc_key_s
 {
@@ -132,7 +132,7 @@ status ec_generate_key(EC_private_key_t* priv_key, const char *curve);
  * Function: ec_verify_key()
  * Verify the given key
  */
-status ec_verify_key( EC_private_key_t* priv_key );
+status ec_verify_key(EC_private_key_t* priv_key);
 
 /*
  * Function: ec_release_key()
@@ -150,31 +150,31 @@ void ec_release_public_key(EC_public_key_t* pub_key);
  * Function: ec_generate_signature()
  * Generates signature using ECDSA algorithm
  */
-status ec_generate_signature( EC_private_key_t* priv_key, EC_signature_t* sign, void* data, size_t size );
+status ec_generate_signature(EC_private_key_t* priv_key, EC_signature_t* sign, void* data, size_t size);
 
 /*
  * Function: ec_verify_signature()
  * Verifies signature using ECDSA algorithm
  */
-status ec_verify_signature( EC_public_key_t* public_key, EC_signature_t* sign, void* data, size_t size );
+status ec_verify_signature(EC_public_key_t* public_key, EC_signature_t* sign, void* data, size_t size);
 
 /*
  * Function: ec_release_signature()
  * Releases signature
  */
-void ec_release_signature( EC_signature_t* sign );
+void ec_release_signature(EC_signature_t* sign);
 
 /*
  * Function: ec_generate_enc_key()
  *
  */
-status ec_generate_enc_key( EC_enc_key_t* enc_key, EC_public_key_t* public_key );
+status ec_generate_enc_key(EC_enc_key_t* enc_key, EC_public_key_t* public_key);
 
 /*
  * Function: ec_generate_dec_key()
  *
  */
-status ec_generate_dec_key( EC_enc_key_t* enc_key, EC_private_key_t* priv_key );
+status ec_generate_dec_key(EC_enc_key_t* enc_key, EC_private_key_t* priv_key);
 
 /*
  * Function: ec_release_enc_key()

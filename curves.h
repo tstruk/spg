@@ -49,14 +49,14 @@ typedef struct curve_str_s
  * Returns curve structure that coresponds to the curve name
  * To list all curves names use list_curves
  */
-status get_curve_by_name( curve* c, const char* name );
+status get_curve_by_name(curve* c, const char* name);
 
 /*
  * Function: get_curve_by_key_len
  * Returns curve structure where the prime p is min len
  * bits long
  */
-status get_curve_by_key_len( curve* c, const int len );
+status get_curve_by_key_len(curve* c, const int len);
 
 /*
  * Function: free_curve
@@ -68,6 +68,6 @@ void free_curve(curve* c);
  * Function: list_curves
  * Lists all implemented curves
  */
-void list_curves( void );
+void list_curves(void);
 
 #endif

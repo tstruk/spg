@@ -24,7 +24,6 @@
  */
 typedef enum
 {
-
     SYM_CIPHER_BLOWFISH = 0,
     SYM_CIPHER_AES,
     SYM_CIPHER_TERM
@@ -78,4 +77,3 @@ status sym_cipher_close(sym_cipher_hdl_t* cipher_hdl);
 void sym_cipher_list(void);
 
 #endif /* SPG_SYM_CIPHER */
-

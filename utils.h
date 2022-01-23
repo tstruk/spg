@@ -32,7 +32,5 @@ void inform_gather_random_data_done(void);
 /*
  * Debuging function - prints big number
  */
-void print_big_number( big_number num );
-
-
+void print_big_number(big_number num);
 #endif
