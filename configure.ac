@@ -1,12 +1,12 @@
 AC_INIT(configure.ac)
-AM_INIT_AUTOMAKE(spg, 0.1)
+AM_INIT_AUTOMAKE(spg, 0.5)
 AM_CONFIG_HEADER(config.h)
 
 AC_LANG_C
 AC_PROG_CC
 AM_PROG_LIBTOOL
 
-PKG_CHECK_MODULES(libcrypto, [libcrypto >= 0.9])
+PKG_CHECK_MODULES(libcrypto, [libcrypto >= 1.0.1])
 AC_SUBST(libcrypto_CFLAGS)
 AC_SUBST(libcrypto_LIBS)
 AC_CHECK_LIB(gcrypt, gcry_mpi_new, [], [
